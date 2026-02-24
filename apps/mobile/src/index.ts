@@ -1,2 +1,4 @@
-// @zeste/mobile - React Native Expo app (BDD)
-export {};
+import { registerRootComponent } from 'expo';
+import App from './App';
+
+registerRootComponent(App);

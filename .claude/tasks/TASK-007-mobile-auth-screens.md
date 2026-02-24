@@ -1,6 +1,6 @@
 # TASK-007 — Mobile Auth Screens (apps/mobile)
 
-**Statut** : `todo`
+**Statut** : `done`
 **Epic** : E1 — Authentification & Gestion de compte
 **User Story** : US-1.1.1, US-1.1.2, US-1.2.1, US-1.2.2, US-1.3.1
 **Dépendances** : TASK-006

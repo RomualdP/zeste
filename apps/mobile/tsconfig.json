@@ -12,7 +12,7 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "coverage"],
+  "exclude": ["node_modules", "dist", "coverage", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test-setup.ts"],
   "references": [
     { "path": "../../packages/shared" },
     { "path": "../../packages/domain" }

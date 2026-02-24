@@ -7,7 +7,9 @@ import { SignupScreen } from '../features/auth/screens/SignupScreen';
 import { ProjectListScreen } from '../features/project/screens/ProjectListScreen';
 import { CreateProjectScreen } from '../features/project/screens/CreateProjectScreen';
 import { ProjectDetailScreen } from '../features/project/screens/ProjectDetailScreen';
+import { AddSourceScreen } from '../features/project/screens/AddSourceScreen';
 import { ConfigureScreen } from '../features/configuration/screens/ConfigureScreen';
+import { ChapterListScreen } from '../features/scenario/screens/ChapterListScreen';
 import type { AuthStackParamList, MainStackParamList } from './types';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -42,9 +44,19 @@ function MainNavigator() {
         options={{ title: 'Projet' }}
       />
       <MainStack.Screen
+        name="AddSource"
+        component={AddSourceScreen}
+        options={{ title: 'Ajouter une source' }}
+      />
+      <MainStack.Screen
         name="Configure"
         component={ConfigureScreen}
         options={{ title: 'Configuration' }}
+      />
+      <MainStack.Screen
+        name="ChapterList"
+        component={ChapterListScreen}
+        options={{ title: 'Chapitres' }}
       />
     </MainStack.Navigator>
   );

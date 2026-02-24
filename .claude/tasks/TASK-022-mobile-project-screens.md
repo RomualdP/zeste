@@ -1,6 +1,6 @@
 # TASK-022 — Mobile Project Management Screens
 
-**Statut** : `todo`
+**Statut** : `done`
 **Epic** : E2 — Gestion de projet & Ingestion
 **User Story** : US-2.1.1, US-2.2.1, US-2.4.1
 **Dépendances** : TASK-021

@@ -1,19 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { apiGet } from '../../../shared/services/api';
+import { apiGet, apiDelete } from '../../../shared/services/api';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainStackParamList } from '../../../navigation/types';
-import type { Project } from '@zeste/shared';
+import type { Project, Source } from '@zeste/shared';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ProjectDetail'>;
 
 export function ProjectDetailScreen({ route, navigation }: Props) {
   const { projectId } = route.params;
   const [project, setProject] = useState<Project | null>(null);
+  const [sources, setSources] = useState<Source[]>([]);
+
+  const loadData = useCallback(async () => {
+    const [proj, srcs] = await Promise.all([
+      apiGet<Project>(`/api/projects/${projectId}`),
+      apiGet<Source[]>(`/api/projects/${projectId}/sources`),
+    ]);
+    setProject(proj);
+    setSources(srcs);
+  }, [projectId]);
 
   useEffect(() => {
-    apiGet<Project>(`/api/projects/${projectId}`).then(setProject);
-  }, [projectId]);
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    return navigation.addListener('focus', loadData);
+  }, [navigation, loadData]);
+
+  const handleDeleteSource = async (sourceId: string) => {
+    await apiDelete(`/api/projects/${projectId}/sources/${sourceId}`);
+    setSources((prev) => prev.filter((s) => s.id !== sourceId));
+  };
 
   if (!project) {
     return (
@@ -43,6 +62,36 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
         <Text style={styles.value}>{project.chapterCount}</Text>
       </View>
 
+      <Text style={styles.sectionTitle}>Sources</Text>
+      {sources.length === 0 ? (
+        <Text style={styles.emptyText}>Aucune source ajoutée</Text>
+      ) : (
+        sources.map((source) => (
+          <View key={source.id} style={styles.sourceCard} testID={`source-${source.id}`}>
+            <View style={styles.sourceInfo}>
+              <Text style={styles.sourceUrl} numberOfLines={1}>
+                {source.url ?? source.filePath ?? 'Source'}
+              </Text>
+              <Text style={styles.sourceStatus}>{source.status}</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => handleDeleteSource(source.id)}
+              testID={`delete-source-${source.id}`}
+            >
+              <Text style={styles.deleteText}>Supprimer</Text>
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
+
+      <TouchableOpacity
+        style={styles.addSourceButton}
+        onPress={() => navigation.navigate('AddSource', { projectId })}
+        testID="add-source-button"
+      >
+        <Text style={styles.addSourceText}>+ Ajouter une source</Text>
+      </TouchableOpacity>
+
       {project.status === 'draft' && (
         <TouchableOpacity
           style={styles.button}
@@ -50,6 +99,16 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
           testID="configure-button"
         >
           <Text style={styles.buttonText}>Configurer</Text>
+        </TouchableOpacity>
+      )}
+
+      {project.status !== 'draft' && (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('ChapterList', { projectId })}
+          testID="chapters-button"
+        >
+          <Text style={styles.buttonText}>Chapitres</Text>
         </TouchableOpacity>
       )}
     </ScrollView>
@@ -63,6 +122,15 @@ const styles = StyleSheet.create({
   info: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
   label: { fontSize: 14, color: '#666' },
   value: { fontSize: 14, fontWeight: '600', textTransform: 'capitalize' },
+  sectionTitle: { fontSize: 18, fontWeight: '600', marginTop: 24, marginBottom: 12 },
+  emptyText: { color: '#888', fontSize: 14, marginBottom: 12 },
+  sourceCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8f8f8', padding: 12, borderRadius: 8, marginBottom: 8 },
+  sourceInfo: { flex: 1, marginRight: 12 },
+  sourceUrl: { fontSize: 14, fontWeight: '500' },
+  sourceStatus: { fontSize: 12, color: '#888', marginTop: 2, textTransform: 'capitalize' },
+  deleteText: { color: '#FF3B30', fontSize: 14, fontWeight: '500' },
+  addSourceButton: { borderWidth: 1, borderColor: '#FF6B35', borderRadius: 8, padding: 12, alignItems: 'center', marginTop: 8, borderStyle: 'dashed' },
+  addSourceText: { color: '#FF6B35', fontSize: 14, fontWeight: '600' },
   button: { backgroundColor: '#FF6B35', borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 24 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

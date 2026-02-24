@@ -2,7 +2,7 @@ import type { ProjectRepositoryPort } from '../../../project/application/ports/p
 import type { SharedLinkRepositoryPort } from '../ports/shared-link-repository.port';
 import { SharedLinkEntity } from '@zeste/domain';
 import { ProjectStatus } from '@zeste/shared';
-import { randomBytes } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 
 interface CreateSharedLinkInput {
   userId: string;
@@ -32,7 +32,7 @@ export class CreateSharedLink {
     }
 
     const slug = randomBytes(6).toString('base64url');
-    const id = `sl-${randomBytes(8).toString('hex')}`;
+    const id = randomUUID();
     const link = SharedLinkEntity.create(id, input.projectId, slug);
 
     await this.sharedLinkRepository.save(link);

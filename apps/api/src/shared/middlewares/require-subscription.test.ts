@@ -18,6 +18,7 @@ describe('requireSubscription', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.BYPASS_SUBSCRIPTION;
   });
 
   it('should return 401 when no user on request', async () => {
@@ -56,6 +57,17 @@ describe('requireSubscription', () => {
       user: { id: 'user-1', email: 'test@example.com' },
       server: { userRepository: mockUserRepo },
     } as unknown as FastifyRequest;
+
+    await requireSubscription(request, mockReply);
+
+    expect(mockReply.status).not.toHaveBeenCalled();
+    expect(mockReply.send).not.toHaveBeenCalled();
+  });
+
+  it('should bypass check when BYPASS_SUBSCRIPTION is true', async () => {
+    process.env.BYPASS_SUBSCRIPTION = 'true';
+
+    const request = { user: undefined } as FastifyRequest;
 
     await requireSubscription(request, mockReply);
 

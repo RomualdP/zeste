@@ -1,6 +1,10 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 export async function requireSubscription(request: FastifyRequest, reply: FastifyReply) {
+  if (process.env.BYPASS_SUBSCRIPTION === 'true') {
+    return;
+  }
+
   if (!request.user) {
     reply.status(401).send({ error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
     return;

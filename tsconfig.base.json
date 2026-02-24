@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

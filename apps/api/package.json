@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "dev": "npx tsx --watch src/server.ts",
+    "start": "node dist/server.js",
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
@@ -11,10 +13,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/sensible": "^6.0.4",
+    "@supabase/supabase-js": "^2.97.0",
+    "@zeste/domain": "workspace:*",
     "@zeste/shared": "workspace:*",
-    "@zeste/domain": "workspace:*"
+    "fastify": "^5.7.4",
+    "fastify-plugin": "^5.1.0"
   },
   "devDependencies": {
+    "@types/node": "^25.3.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }

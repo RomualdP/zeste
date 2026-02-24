@@ -1,2 +1,1 @@
-// @zeste/api - Backend Node.js TypeScript (DDD)
-export {};
+export { createApp } from './create-app';

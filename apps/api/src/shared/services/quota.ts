@@ -1,24 +1,21 @@
-import { UserTier, QUOTAS, type TargetDuration } from '@zeste/shared';
+import { QUOTAS, type TargetDuration } from '@zeste/shared';
 
 export class QuotaService {
-  static checkProjectQuota(tier: UserTier, currentProjectCount: number): void {
-    const quotas = tier === UserTier.Premium ? QUOTAS.PREMIUM : QUOTAS.FREE;
-    if (currentProjectCount >= quotas.maxProjects) {
-      throw new Error(`Maximum ${quotas.maxProjects} projects for your plan`);
+  static checkProjectQuota(currentProjectCount: number): void {
+    if (currentProjectCount >= QUOTAS.maxProjects) {
+      throw new Error(`Maximum ${QUOTAS.maxProjects} projects allowed`);
     }
   }
 
-  static checkSourceQuota(tier: UserTier, currentSourceCount: number): void {
-    const quotas = tier === UserTier.Premium ? QUOTAS.PREMIUM : QUOTAS.FREE;
-    if (currentSourceCount >= quotas.maxSourcesPerProject) {
-      throw new Error(`Maximum ${quotas.maxSourcesPerProject} sources per project for your plan`);
+  static checkSourceQuota(currentSourceCount: number): void {
+    if (currentSourceCount >= QUOTAS.maxSourcesPerProject) {
+      throw new Error(`Maximum ${QUOTAS.maxSourcesPerProject} sources per project allowed`);
     }
   }
 
-  static checkDurationQuota(tier: UserTier, targetDuration: TargetDuration): void {
-    const quotas = tier === UserTier.Premium ? QUOTAS.PREMIUM : QUOTAS.FREE;
-    if (targetDuration > quotas.maxAudioDurationMinutes) {
-      throw new Error(`Maximum ${quotas.maxAudioDurationMinutes} minutes for your plan`);
+  static checkDurationQuota(targetDuration: TargetDuration): void {
+    if (targetDuration > QUOTAS.maxAudioDurationMinutes) {
+      throw new Error(`Maximum ${QUOTAS.maxAudioDurationMinutes} minutes allowed`);
     }
   }
 }

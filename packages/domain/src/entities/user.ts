@@ -1,26 +1,28 @@
 import { Entity } from '../base';
 import { Email } from '../value-objects/email';
 import { DisplayName } from '../value-objects/display-name';
-import { UserTier } from '@zeste/shared';
 
 interface UserProps {
   email: Email;
   displayName: DisplayName;
-  tier: UserTier;
+  subscriptionActive: boolean;
+  subscriptionExpiresAt: string | null;
   createdAt: string;
 }
 
 export class UserEntity extends Entity {
   readonly email: Email;
   readonly displayName: DisplayName;
-  readonly tier: UserTier;
+  readonly subscriptionActive: boolean;
+  readonly subscriptionExpiresAt: string | null;
   readonly createdAt: string;
 
   constructor(id: string, props: UserProps) {
     super(id);
     this.email = props.email;
     this.displayName = props.displayName;
-    this.tier = props.tier;
+    this.subscriptionActive = props.subscriptionActive;
+    this.subscriptionExpiresAt = props.subscriptionExpiresAt;
     this.createdAt = props.createdAt;
   }
 
@@ -28,28 +30,24 @@ export class UserEntity extends Entity {
     return new UserEntity(id, {
       email: new Email(email),
       displayName: new DisplayName(displayName),
-      tier: UserTier.Free,
+      subscriptionActive: false,
+      subscriptionExpiresAt: null,
       createdAt: new Date().toISOString(),
     });
   }
 
-  upgradeTier(): UserEntity {
-    if (this.tier === UserTier.Premium) {
-      throw new Error('User is already premium');
-    }
+  activateSubscription(expiresAt: string): UserEntity {
     return new UserEntity(this.id, {
       ...this.toProps(),
-      tier: UserTier.Premium,
+      subscriptionActive: true,
+      subscriptionExpiresAt: expiresAt,
     });
   }
 
-  downgradeTier(): UserEntity {
-    if (this.tier === UserTier.Free) {
-      throw new Error('User is already free');
-    }
+  deactivateSubscription(): UserEntity {
     return new UserEntity(this.id, {
       ...this.toProps(),
-      tier: UserTier.Free,
+      subscriptionActive: false,
     });
   }
 
@@ -64,7 +62,8 @@ export class UserEntity extends Entity {
     return {
       email: this.email,
       displayName: this.displayName,
-      tier: this.tier,
+      subscriptionActive: this.subscriptionActive,
+      subscriptionExpiresAt: this.subscriptionExpiresAt,
       createdAt: this.createdAt,
     };
   }

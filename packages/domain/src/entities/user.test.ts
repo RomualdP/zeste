@@ -2,10 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { UserEntity } from './user';
 import { Email } from '../value-objects/email';
 import { DisplayName } from '../value-objects/display-name';
-import { UserTier } from '@zeste/shared';
 
 describe('UserEntity', () => {
-  const makeUser = (overrides?: Partial<{ id: string; email: string; displayName: string; tier: UserTier }>) =>
+  const makeUser = (overrides?: Partial<{ id: string; email: string; displayName: string }>) =>
     UserEntity.create(
       overrides?.id ?? 'user-1',
       overrides?.email ?? 'test@example.com',
@@ -13,14 +12,15 @@ describe('UserEntity', () => {
     );
 
   describe('create', () => {
-    it('should create a user with default free tier', () => {
+    it('should create a user with inactive subscription', () => {
       const user = makeUser();
       expect(user.id).toBe('user-1');
       expect(user.email).toBeInstanceOf(Email);
       expect(user.email.value).toBe('test@example.com');
       expect(user.displayName).toBeInstanceOf(DisplayName);
       expect(user.displayName.value).toBe('Jean Dupont');
-      expect(user.tier).toBe(UserTier.Free);
+      expect(user.subscriptionActive).toBe(false);
+      expect(user.subscriptionExpiresAt).toBeNull();
       expect(user.createdAt).toBeDefined();
     });
 
@@ -33,31 +33,30 @@ describe('UserEntity', () => {
     });
   });
 
-  describe('upgradeTier', () => {
-    it('should upgrade from free to premium', () => {
+  describe('activateSubscription', () => {
+    it('should activate subscription with expiration date', () => {
       const user = makeUser();
-      const upgraded = user.upgradeTier();
-      expect(upgraded.tier).toBe(UserTier.Premium);
-      expect(upgraded.id).toBe(user.id);
-      expect(upgraded.email.value).toBe(user.email.value);
+      const expiresAt = '2026-03-24T00:00:00.000Z';
+      const activated = user.activateSubscription(expiresAt);
+      expect(activated.subscriptionActive).toBe(true);
+      expect(activated.subscriptionExpiresAt).toBe(expiresAt);
+      expect(activated.id).toBe(user.id);
     });
 
-    it('should throw when already premium', () => {
-      const user = makeUser().upgradeTier();
-      expect(() => user.upgradeTier()).toThrow('already premium');
+    it('should return a new instance', () => {
+      const user = makeUser();
+      const activated = user.activateSubscription('2026-03-24T00:00:00.000Z');
+      expect(user).not.toBe(activated);
+      expect(user.subscriptionActive).toBe(false);
     });
   });
 
-  describe('downgradeTier', () => {
-    it('should downgrade from premium to free', () => {
-      const user = makeUser().upgradeTier();
-      const downgraded = user.downgradeTier();
-      expect(downgraded.tier).toBe(UserTier.Free);
-    });
-
-    it('should throw when already free', () => {
-      const user = makeUser();
-      expect(() => user.downgradeTier()).toThrow('already free');
+  describe('deactivateSubscription', () => {
+    it('should deactivate subscription', () => {
+      const user = makeUser().activateSubscription('2026-03-24T00:00:00.000Z');
+      const deactivated = user.deactivateSubscription();
+      expect(deactivated.subscriptionActive).toBe(false);
+      expect(deactivated.subscriptionExpiresAt).toBe('2026-03-24T00:00:00.000Z');
     });
   });
 
@@ -73,10 +72,10 @@ describe('UserEntity', () => {
   describe('immutability', () => {
     it('should return a new instance on mutation', () => {
       const user = makeUser();
-      const upgraded = user.upgradeTier();
-      expect(user).not.toBe(upgraded);
-      expect(user.tier).toBe(UserTier.Free);
-      expect(upgraded.tier).toBe(UserTier.Premium);
+      const updated = user.updateDisplayName('Autre Nom');
+      expect(user).not.toBe(updated);
+      expect(user.displayName.value).toBe('Jean Dupont');
+      expect(updated.displayName.value).toBe('Autre Nom');
     });
   });
 

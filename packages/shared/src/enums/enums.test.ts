@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  UserTier,
   ProjectStatus,
   SourceType,
   SourceStatus,
@@ -8,13 +7,6 @@ import {
   TargetDuration,
   ChapterStatus,
 } from './index';
-
-describe('UserTier', () => {
-  it('should have free and premium values', () => {
-    expect(UserTier.Free).toBe('free');
-    expect(UserTier.Premium).toBe('premium');
-  });
-});
 
 describe('ProjectStatus', () => {
   it('should have all project lifecycle statuses', () => {

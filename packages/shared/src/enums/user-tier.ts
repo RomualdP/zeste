@@ -1,6 +1,2 @@
-export const UserTier = {
-  Free: 'free',
-  Premium: 'premium',
-} as const;
-
-export type UserTier = (typeof UserTier)[keyof typeof UserTier];
+// No tiers — subscription-only model. File kept for reference.
+// All users are subscribers with the same quota limits.

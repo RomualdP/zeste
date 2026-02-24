@@ -1,13 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UserEntity, Email, DisplayName } from '@zeste/domain';
-import { UserTier } from '@zeste/shared';
 import type { UserRepositoryPort } from '../application/ports/user-repository.port';
 
 interface UserRow {
   id: string;
   email: string;
   display_name: string;
-  tier: string;
+  subscription_active: boolean;
+  subscription_expires_at: string | null;
   created_at: string;
 }
 
@@ -41,7 +41,8 @@ export class SupabaseUserRepository implements UserRepositoryPort {
       id: user.id,
       email: user.email.value,
       display_name: user.displayName.value,
-      tier: user.tier,
+      subscription_active: user.subscriptionActive,
+      subscription_expires_at: user.subscriptionExpiresAt,
       created_at: user.createdAt,
     });
 
@@ -57,7 +58,8 @@ export class SupabaseUserRepository implements UserRepositoryPort {
     return new UserEntity(row.id, {
       email: new Email(row.email),
       displayName: new DisplayName(row.display_name),
-      tier: row.tier as UserTier,
+      subscriptionActive: row.subscription_active ?? false,
+      subscriptionExpiresAt: row.subscription_expires_at ?? null,
       createdAt: row.created_at,
     });
   }

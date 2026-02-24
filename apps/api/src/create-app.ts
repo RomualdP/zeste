@@ -10,6 +10,7 @@ import { scenarioRoutes } from './modules/scenario/interfaces/scenario';
 import { chapterRoutes } from './modules/scenario/interfaces/chapters';
 import { audioRoutes } from './modules/audio/interfaces/audio';
 import { sharingRoutes } from './modules/sharing/interfaces/sharing';
+import { webhookRoutes } from './modules/identity/interfaces/webhooks';
 import type { AuthServicePort } from './modules/identity/application/ports/auth-service.port';
 import type { UserRepositoryPort } from './modules/identity/application/ports/user-repository.port';
 import type { ProjectRepositoryPort } from './modules/project/application/ports/project-repository.port';
@@ -62,6 +63,7 @@ export function createApp(deps: AppDependencies = {}) {
   app.register(chapterRoutes, { prefix: '/api/projects/:id' });
   app.register(audioRoutes, { prefix: '/api/projects/:id' });
   app.register(sharingRoutes);
+  app.register(webhookRoutes, { prefix: '/api/webhooks' });
 
   return app;
 }

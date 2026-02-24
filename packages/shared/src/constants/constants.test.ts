@@ -2,29 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { QUOTAS, AUDIO } from './index';
 
 describe('QUOTAS', () => {
-  it('should define free tier limits per PRD', () => {
-    expect(QUOTAS.FREE.maxProjects).toBe(3);
-    expect(QUOTAS.FREE.maxSourcesPerProject).toBe(3);
-    expect(QUOTAS.FREE.maxPdfPages).toBe(50);
-    expect(QUOTAS.FREE.maxAudioDurationMinutes).toBe(15);
-  });
-
-  it('should define premium tier limits per PRD', () => {
-    expect(QUOTAS.PREMIUM.maxProjects).toBe(20);
-    expect(QUOTAS.PREMIUM.maxSourcesPerProject).toBe(10);
-    expect(QUOTAS.PREMIUM.maxPdfPages).toBe(200);
-    expect(QUOTAS.PREMIUM.maxAudioDurationMinutes).toBe(30);
-  });
-
-  it('should have premium limits strictly greater than free limits', () => {
-    expect(QUOTAS.PREMIUM.maxProjects).toBeGreaterThan(QUOTAS.FREE.maxProjects);
-    expect(QUOTAS.PREMIUM.maxSourcesPerProject).toBeGreaterThan(
-      QUOTAS.FREE.maxSourcesPerProject,
-    );
-    expect(QUOTAS.PREMIUM.maxPdfPages).toBeGreaterThan(QUOTAS.FREE.maxPdfPages);
-    expect(QUOTAS.PREMIUM.maxAudioDurationMinutes).toBeGreaterThan(
-      QUOTAS.FREE.maxAudioDurationMinutes,
-    );
+  it('should define subscriber limits', () => {
+    expect(QUOTAS.maxProjects).toBe(20);
+    expect(QUOTAS.maxSourcesPerProject).toBe(10);
+    expect(QUOTAS.maxPdfPages).toBe(200);
+    expect(QUOTAS.maxAudioDurationMinutes).toBe(30);
   });
 });
 

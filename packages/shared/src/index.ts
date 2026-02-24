@@ -1,6 +1,5 @@
 // Enums
 export {
-  UserTier,
   ProjectStatus,
   SourceType,
   SourceStatus,

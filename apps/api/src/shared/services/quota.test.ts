@@ -1,55 +1,35 @@
 import { describe, it, expect } from 'vitest';
 import { QuotaService } from './quota';
-import { UserTier, TargetDuration } from '@zeste/shared';
+import { TargetDuration } from '@zeste/shared';
 
 describe('QuotaService', () => {
   describe('checkProjectQuota', () => {
-    it('should allow free user with less than 3 projects', () => {
-      expect(() => QuotaService.checkProjectQuota(UserTier.Free, 2)).not.toThrow();
+    it('should allow user with less than 20 projects', () => {
+      expect(() => QuotaService.checkProjectQuota(19)).not.toThrow();
     });
 
-    it('should reject free user at 3 projects', () => {
-      expect(() => QuotaService.checkProjectQuota(UserTier.Free, 3)).toThrow('Maximum 3 projects');
-    });
-
-    it('should allow premium user with up to 20 projects', () => {
-      expect(() => QuotaService.checkProjectQuota(UserTier.Premium, 19)).not.toThrow();
-    });
-
-    it('should reject premium user at 20 projects', () => {
-      expect(() => QuotaService.checkProjectQuota(UserTier.Premium, 20)).toThrow('Maximum 20 projects');
+    it('should reject user at 20 projects', () => {
+      expect(() => QuotaService.checkProjectQuota(20)).toThrow('Maximum 20 projects');
     });
   });
 
   describe('checkSourceQuota', () => {
-    it('should allow free user with less than 3 sources', () => {
-      expect(() => QuotaService.checkSourceQuota(UserTier.Free, 2)).not.toThrow();
+    it('should allow user with less than 10 sources', () => {
+      expect(() => QuotaService.checkSourceQuota(9)).not.toThrow();
     });
 
-    it('should reject free user at 3 sources', () => {
-      expect(() => QuotaService.checkSourceQuota(UserTier.Free, 3)).toThrow('Maximum 3 sources');
-    });
-
-    it('should allow premium user with up to 10 sources', () => {
-      expect(() => QuotaService.checkSourceQuota(UserTier.Premium, 9)).not.toThrow();
-    });
-
-    it('should reject premium user at 10 sources', () => {
-      expect(() => QuotaService.checkSourceQuota(UserTier.Premium, 10)).toThrow('Maximum 10 sources');
+    it('should reject user at 10 sources', () => {
+      expect(() => QuotaService.checkSourceQuota(10)).toThrow('Maximum 10 sources');
     });
   });
 
   describe('checkDurationQuota', () => {
-    it('should allow free user with 15min or less', () => {
-      expect(() => QuotaService.checkDurationQuota(UserTier.Free, TargetDuration.Medium)).not.toThrow();
+    it('should allow 30 minutes or less', () => {
+      expect(() => QuotaService.checkDurationQuota(TargetDuration.Long)).not.toThrow();
     });
 
-    it('should reject free user with 30min', () => {
-      expect(() => QuotaService.checkDurationQuota(UserTier.Free, TargetDuration.Long)).toThrow('Maximum 15 minutes');
-    });
-
-    it('should allow premium user with 30min', () => {
-      expect(() => QuotaService.checkDurationQuota(UserTier.Premium, TargetDuration.Long)).not.toThrow();
+    it('should reject duration exceeding 30 minutes', () => {
+      expect(() => QuotaService.checkDurationQuota(45 as TargetDuration)).toThrow('Maximum 30 minutes');
     });
   });
 });

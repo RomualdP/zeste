@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { UserEntity, Email, DisplayName } from '@zeste/domain';
 import { UserTier } from '@zeste/shared';
-import type { UserRepositoryPort } from '../../application/ports/user-repository.port';
+import type { UserRepositoryPort } from '../application/ports/user-repository.port';
 
 interface UserRow {
   id: string;

@@ -1,37 +1,14 @@
-import type { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
-import { RegisterUser } from '../../../application/use-cases/register-user';
-import { LoginUser } from '../../../application/use-cases/login-user';
-import { LogoutUser } from '../../../application/use-cases/logout-user';
-import { DeleteAccount } from '../../../application/use-cases/delete-account';
-import type { AuthServicePort } from '../../../application/ports/auth-service.port';
-import type { UserRepositoryPort } from '../../../application/ports/user-repository.port';
+import type { FastifyPluginAsync } from 'fastify';
+import { RegisterUser } from '../application/use-cases/register-user';
+import { LoginUser } from '../application/use-cases/login-user';
+import { LogoutUser } from '../application/use-cases/logout-user';
+import { DeleteAccount } from '../application/use-cases/delete-account';
+import type { UserRepositoryPort } from '../application/ports/user-repository.port';
+import { requireAuth } from '../../../shared/middlewares/require-auth';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    authService: AuthServicePort;
     userRepository: UserRepositoryPort;
-  }
-}
-
-function extractToken(request: FastifyRequest): string | null {
-  const auth = request.headers.authorization;
-  if (!auth?.startsWith('Bearer ')) return null;
-  return auth.slice(7);
-}
-
-async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
-  const token = extractToken(request);
-  if (!token) {
-    reply.status(401).send({ error: { code: 'UNAUTHORIZED', message: 'Missing authorization token' } });
-    return;
-  }
-
-  try {
-    const user = await (request.server as any).authService.verifyToken(token);
-    (request as any).user = user;
-    (request as any).accessToken = token;
-  } catch {
-    reply.status(401).send({ error: { code: 'UNAUTHORIZED', message: 'Invalid token' } });
   }
 }
 
@@ -87,17 +64,15 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
 
   // POST /logout — authenticated
   app.post('/logout', { preHandler: requireAuth }, async (request, reply) => {
-    const token = (request as any).accessToken as string;
     const useCase = new LogoutUser(app.authService);
-    await useCase.execute({ accessToken: token });
+    await useCase.execute({ accessToken: request.accessToken! });
     return reply.status(200).send({ data: { message: 'Logged out' } });
   });
 
   // DELETE /account — authenticated
   app.delete('/account', { preHandler: requireAuth }, async (request, reply) => {
-    const user = (request as any).user as { id: string };
     const useCase = new DeleteAccount(app.authService, app.userRepository);
-    await useCase.execute({ userId: user.id });
+    await useCase.execute({ userId: request.user!.id });
     return reply.status(204).send();
   });
 };

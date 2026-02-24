@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { AuthServicePort, AuthTokens, AuthUser } from '../../application/ports/auth-service.port';
+import type { AuthServicePort, AuthTokens, AuthUser } from '../application/ports/auth-service.port';
 
 export class SupabaseAuthService implements AuthServicePort {
   constructor(

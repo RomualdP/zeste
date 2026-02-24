@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Fastify from 'fastify';
 import { authRoutes } from './auth';
-import type { AuthServicePort } from '../../../application/ports/auth-service.port';
-import type { UserRepositoryPort } from '../../../application/ports/user-repository.port';
+import type { AuthServicePort } from '../application/ports/auth-service.port';
+import type { UserRepositoryPort } from '../application/ports/user-repository.port';
 
 function createMocks() {
   const authService: AuthServicePort = {

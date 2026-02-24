@@ -21,6 +21,7 @@
     "@zeste/domain": "workspace:*",
     "@zeste/shared": "workspace:*",
     "expo": "^54.0.33",
+    "expo-clipboard": "^8.0.8",
     "expo-secure-store": "^15.0.8",
     "react": "^19.2.3",
     "react-native": "^0.84.0",

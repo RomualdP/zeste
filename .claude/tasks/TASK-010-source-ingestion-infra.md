@@ -1,6 +1,6 @@
 # TASK-010 — Source Ingestion Infrastructure (apps/api)
 
-**Statut** : `todo`
+**Statut** : `done`
 **Epic** : E2 — Gestion de projet & Ingestion de sources
 **User Story** : US-2.2.1, US-2.3.1
 **Dépendances** : TASK-009

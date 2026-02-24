@@ -111,6 +111,25 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
           <Text style={styles.buttonText}>Chapitres</Text>
         </TouchableOpacity>
       )}
+
+      {project.status === 'ready' && (
+        <>
+          <TouchableOpacity
+            style={[styles.button, styles.listenButton]}
+            onPress={() => navigation.navigate('Player', { projectId })}
+            testID="listen-button"
+          >
+            <Text style={styles.buttonText}>Écouter</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.shareButton]}
+            onPress={() => navigation.navigate('Share', { projectId })}
+            testID="share-button"
+          >
+            <Text style={styles.buttonText}>Partager</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -132,5 +151,7 @@ const styles = StyleSheet.create({
   addSourceButton: { borderWidth: 1, borderColor: '#FF6B35', borderRadius: 8, padding: 12, alignItems: 'center', marginTop: 8, borderStyle: 'dashed' },
   addSourceText: { color: '#FF6B35', fontSize: 14, fontWeight: '600' },
   button: { backgroundColor: '#FF6B35', borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 24 },
+  listenButton: { backgroundColor: '#4CAF50' },
+  shareButton: { backgroundColor: '#2196F3' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

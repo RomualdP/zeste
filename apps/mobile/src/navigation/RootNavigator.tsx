@@ -10,6 +10,8 @@ import { ProjectDetailScreen } from '../features/project/screens/ProjectDetailSc
 import { AddSourceScreen } from '../features/project/screens/AddSourceScreen';
 import { ConfigureScreen } from '../features/configuration/screens/ConfigureScreen';
 import { ChapterListScreen } from '../features/scenario/screens/ChapterListScreen';
+import { PlayerScreen } from '../features/player/screens/PlayerScreen';
+import { ShareScreen } from '../features/sharing/screens/ShareScreen';
 import type { AuthStackParamList, MainStackParamList } from './types';
 import { ActivityIndicator, View } from 'react-native';
 
@@ -57,6 +59,16 @@ function MainNavigator() {
         name="ChapterList"
         component={ChapterListScreen}
         options={{ title: 'Chapitres' }}
+      />
+      <MainStack.Screen
+        name="Player"
+        component={PlayerScreen}
+        options={{ title: 'Lecteur' }}
+      />
+      <MainStack.Screen
+        name="Share"
+        component={ShareScreen}
+        options={{ title: 'Partager' }}
       />
     </MainStack.Navigator>
   );

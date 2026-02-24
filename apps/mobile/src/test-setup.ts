@@ -1,3 +1,7 @@
+jest.mock('expo-clipboard', () => ({
+  setStringAsync: jest.fn(),
+}));
+
 jest.mock('./shared/services/supabase', () => ({
   supabase: {
     auth: {

@@ -10,4 +10,6 @@ export type MainStackParamList = {
   AddSource: { projectId: string };
   Configure: { projectId: string };
   ChapterList: { projectId: string };
+  Player: { projectId: string };
+  Share: { projectId: string };
 };

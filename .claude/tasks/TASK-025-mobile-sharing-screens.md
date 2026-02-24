@@ -1,6 +1,6 @@
 # TASK-025 — Mobile Sharing Screens
 
-**Statut** : `todo`
+**Statut** : `done`
 **Epic** : E7 — Export & Partage
 **User Story** : US-7.1.1, US-7.2.1
 **Dépendances** : TASK-024

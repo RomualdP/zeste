@@ -1,6 +1,6 @@
 # TASK-024 — Mobile Audio Player
 
-**Statut** : `todo`
+**Statut** : `done`
 **Epic** : E6 — Lecteur audio & Playlist
 **User Story** : US-6.1.1, US-6.2.1
 **Dépendances** : TASK-023

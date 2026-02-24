@@ -4,7 +4,11 @@ import { SupabaseAuthService } from './modules/identity/infrastructure/supabase-
 import { SupabaseUserRepository } from './modules/identity/infrastructure/supabase-user-repository';
 import { SupabaseProjectRepository } from './modules/project/infrastructure/supabase-project-repository';
 import { SupabaseSourceRepository } from './modules/project/infrastructure/supabase-source-repository';
+import { JinaIngestionService } from './modules/project/infrastructure/jina-ingestion-service';
 import { SupabaseChapterRepository } from './modules/scenario/infrastructure/supabase-chapter-repository';
+import { MistralLlmService } from './modules/scenario/infrastructure/mistral-llm-service';
+import { FishAudioTtsService } from './modules/audio/infrastructure/fish-audio-tts-service';
+import { SupabaseAudioStorage } from './modules/audio/infrastructure/supabase-audio-storage';
 import { SupabaseSharedLinkRepository } from './modules/sharing/infrastructure/supabase-shared-link-repository';
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -19,12 +23,16 @@ async function start() {
     userRepository: new SupabaseUserRepository(supabaseClient),
     projectRepository: new SupabaseProjectRepository(supabaseClient),
     sourceRepository: new SupabaseSourceRepository(supabaseClient),
+    ingestionService: new JinaIngestionService(process.env.JINA_API_KEY!),
     chapterRepository: new SupabaseChapterRepository(supabaseClient),
+    llmService: new MistralLlmService(process.env.MISTRAL_API_KEY!),
+    ttsService: new FishAudioTtsService(
+      process.env.FISH_AUDIO_API_KEY!,
+      process.env.FISH_AUDIO_HOST_VOICE_ID ?? '',
+      process.env.FISH_AUDIO_EXPERT_VOICE_ID ?? '',
+    ),
+    audioStorage: new SupabaseAudioStorage(supabaseClient),
     sharedLinkRepository: new SupabaseSharedLinkRepository(supabaseClient),
-    // ingestionService: requires Jina/Pixtral API keys
-    // llmService: requires Mistral API key
-    // ttsService: requires Fish Audio API key
-    // audioStorage: requires Supabase Storage bucket config
   });
 
   try {

@@ -34,6 +34,8 @@ export class GenerateChapterPlan {
     // Delete existing chapters before regenerating
     await this.chapterRepository.deleteByProjectId(input.projectId);
 
+    console.log('[GENERATE-PLAN] Project config:', { tone: project.tone, targetDuration: project.targetDuration, chapterCount: project.chapterCount });
+
     const planItems = await this.llmService.generateChapterPlan({
       sources: ingestedSources.map((s) => s.rawContent),
       tone: project.tone,

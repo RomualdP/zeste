@@ -38,12 +38,11 @@ export function ConfigureScreen({ route, navigation }: Props) {
 
   const handleSubmit = async () => {
     setLoading(true);
+    const payload = { tone, targetDuration: duration, chapterCount: chapters };
+    console.log('[CONFIGURE] Submitting:', payload, '→', `/api/projects/${projectId}/configure`);
     try {
-      await apiPatch<Project>(`/api/projects/${projectId}/configure`, {
-        tone,
-        targetDuration: duration,
-        chapterCount: chapters,
-      });
+      const result = await apiPatch<Project>(`/api/projects/${projectId}/configure`, payload);
+      console.log('[CONFIGURE] Success:', result);
       navigation.goBack();
     } catch (err: any) {
       Alert.alert('Erreur', err.message);

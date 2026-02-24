@@ -30,7 +30,7 @@ export function useAuth() {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
-    // Call the backend which creates both auth.users AND public.users rows
+    console.log('[AUTH] Signup →', `${API_URL}/api/auth/register`);
     const response = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

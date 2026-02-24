@@ -14,6 +14,8 @@ export const configureRoutes: FastifyPluginAsync = async (app) => {
       chapterCount?: number;
     };
 
+    console.log('[CONFIGURE] Received:', { id, tone, targetDuration, chapterCount });
+
     if (!tone || targetDuration === undefined || chapterCount === undefined) {
       return reply.status(400).send({
         error: { code: 'VALIDATION_ERROR', message: 'tone, targetDuration and chapterCount are required' },
@@ -29,6 +31,8 @@ export const configureRoutes: FastifyPluginAsync = async (app) => {
         targetDuration: targetDuration as any,
         chapterCount,
       });
+
+      console.log('[CONFIGURE] Saved:', { tone: project.tone, targetDuration: project.targetDuration, chapterCount: project.chapterCount });
 
       return reply.status(200).send({
         data: {

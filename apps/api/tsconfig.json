@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "paths": {
+      "@zeste/shared": ["../../packages/shared/src"],
+      "@zeste/shared/*": ["../../packages/shared/src/*"],
+      "@zeste/domain": ["../../packages/domain/src"],
+      "@zeste/domain/*": ["../../packages/domain/src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "coverage"]
+}

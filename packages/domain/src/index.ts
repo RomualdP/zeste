@@ -6,7 +6,7 @@ export type { DomainEvent } from './base';
 export { Email, ProjectName, Slug, AudioDuration, Password, DisplayName } from './value-objects';
 
 // Entities
-export { ProjectEntity, SourceEntity, ChapterEntity, UserEntity } from './entities';
+export { ProjectEntity, SourceEntity, ChapterEntity, UserEntity, SharedLinkEntity } from './entities';
 
 // Events
 export type {

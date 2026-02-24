@@ -1,6 +1,6 @@
 # TASK-009 — Source Management Backend (apps/api)
 
-**Statut** : `in_progress`
+**Statut** : `done`
 **Epic** : E2 — Gestion de projet & Ingestion de sources
 **User Story** : US-2.2.1, US-2.3.1, US-2.4.1, US-2.4.2
 **Dépendances** : TASK-008

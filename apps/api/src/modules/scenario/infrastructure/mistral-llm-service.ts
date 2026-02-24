@@ -78,7 +78,7 @@ Alterne les prises de parole de manière naturelle. Chaque entrée fait 2-4 phra
       throw new Error(`Mistral API error (${response.status}): ${errorText}`);
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
     const content = data.choices[0]?.message?.content ?? '[]';
 
     // Extract JSON array from response (Mistral may wrap in object)

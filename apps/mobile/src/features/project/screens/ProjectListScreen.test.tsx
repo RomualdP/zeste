@@ -8,6 +8,7 @@ jest.mock('../../../shared/services/api');
 const mockNavigation = {
   navigate: jest.fn(),
   addListener: jest.fn(() => jest.fn()),
+  setOptions: jest.fn(),
 } as any;
 
 const mockRoute = {} as any;

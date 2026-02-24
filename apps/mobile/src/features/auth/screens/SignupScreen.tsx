@@ -8,16 +8,18 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Signup'>;
 
 export function SignupScreen({ navigation }: Props) {
   const { signUp } = useAuth();
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
-    if (!email || !password) return;
+    if (!email || !password || !displayName) return;
     setLoading(true);
     try {
-      await signUp(email, password);
-      Alert.alert('Succès', 'Vérifiez votre email pour confirmer votre compte.');
+      await signUp(email, password, displayName);
+      Alert.alert('Succès', 'Compte créé ! Connectez-vous.');
+      navigation.navigate('Login');
     } catch (err: any) {
       Alert.alert('Erreur', err.message);
     } finally {
@@ -29,6 +31,14 @@ export function SignupScreen({ navigation }: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Créer un compte</Text>
 
+      <TextInput
+        style={styles.input}
+        placeholder="Nom d'affichage"
+        value={displayName}
+        onChangeText={setDisplayName}
+        autoCapitalize="words"
+        testID="signup-displayname-input"
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -50,7 +60,7 @@ export function SignupScreen({ navigation }: Props) {
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleSignup}
-        disabled={loading}
+        disabled={loading || !displayName || !email || !password}
         testID="signup-submit-button"
       >
         <Text style={styles.buttonText}>

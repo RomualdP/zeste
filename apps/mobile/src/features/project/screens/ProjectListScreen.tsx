@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { apiGet } from '../../../shared/services/api';
+import { useAuth } from '../../auth/hooks/useAuth';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainStackParamList } from '../../../navigation/types';
 import type { Project } from '@zeste/shared';
@@ -8,8 +9,19 @@ import type { Project } from '@zeste/shared';
 type Props = NativeStackScreenProps<MainStackParamList, 'ProjectList'>;
 
 export function ProjectListScreen({ navigation }: Props) {
+  const { signOut } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={signOut} testID="logout-button">
+          <Text style={{ color: '#FF6B35', fontSize: 14, fontWeight: '600' }}>Déconnexion</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, signOut]);
 
   const loadProjects = useCallback(async () => {
     try {

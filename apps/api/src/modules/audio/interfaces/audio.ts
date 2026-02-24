@@ -37,4 +37,33 @@ export const audioRoutes: FastifyPluginAsync = async (app) => {
       });
     }
   });
+
+  // GET /chapters/:chapterId/audio — get signed URL for chapter audio
+  app.get('/chapters/:chapterId/audio', async (request, reply) => {
+    const { id, chapterId } = request.params as { id: string; chapterId: string };
+
+    try {
+      const project = await app.projectRepository.findById(id);
+      if (!project || project.userId !== request.user!.id) {
+        return reply.status(404).send({
+          error: { code: 'NOT_FOUND', message: 'Project not found' },
+        });
+      }
+
+      const chapters = await app.chapterRepository.findByProjectId(id);
+      const chapter = chapters.find((c) => c.id === chapterId);
+      if (!chapter || !chapter.audioPath) {
+        return reply.status(404).send({
+          error: { code: 'NOT_FOUND', message: 'Audio not found' },
+        });
+      }
+
+      const signedUrl = await app.audioStorage.getUrl(chapter.audioPath);
+      return reply.status(200).send({ data: { url: signedUrl } });
+    } catch (err: any) {
+      return reply.status(400).send({
+        error: { code: 'AUDIO_ERROR', message: err.message },
+      });
+    }
+  });
 };

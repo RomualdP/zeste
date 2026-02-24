@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { ProjectRepositoryPort } from '../../../project/application/ports/project-repository.port';
 import type { SourceRepositoryPort } from '../../../project/application/ports/source-repository.port';
 import type { ChapterRepositoryPort } from '../ports/chapter-repository.port';
@@ -41,7 +42,7 @@ export class GenerateChapterPlan {
 
     const chapters = planItems.map((item, index) =>
       ChapterEntity.create(
-        `${input.projectId}-ch-${index}`,
+        randomUUID(),
         input.projectId,
         item.title,
         item.summary,

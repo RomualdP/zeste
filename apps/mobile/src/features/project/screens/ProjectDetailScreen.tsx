@@ -92,23 +92,21 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
         <Text style={styles.addSourceText}>+ Ajouter une source</Text>
       </TouchableOpacity>
 
-      {project.status === 'draft' && (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate('Configure', { projectId })}
-          testID="configure-button"
-        >
-          <Text style={styles.buttonText}>Configurer</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('Configure', { projectId })}
+        testID="configure-button"
+      >
+        <Text style={styles.buttonText}>Configurer</Text>
+      </TouchableOpacity>
 
-      {project.status !== 'draft' && (
+      {sources.length > 0 && (
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, styles.generateButton]}
           onPress={() => navigation.navigate('ChapterList', { projectId })}
           testID="chapters-button"
         >
-          <Text style={styles.buttonText}>Chapitres</Text>
+          <Text style={styles.buttonText}>Générer le podcast</Text>
         </TouchableOpacity>
       )}
 
@@ -151,6 +149,7 @@ const styles = StyleSheet.create({
   addSourceButton: { borderWidth: 1, borderColor: '#FF6B35', borderRadius: 8, padding: 12, alignItems: 'center', marginTop: 8, borderStyle: 'dashed' },
   addSourceText: { color: '#FF6B35', fontSize: 14, fontWeight: '600' },
   button: { backgroundColor: '#FF6B35', borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 24 },
+  generateButton: { backgroundColor: '#E65100' },
   listenButton: { backgroundColor: '#4CAF50' },
   shareButton: { backgroundColor: '#2196F3' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },

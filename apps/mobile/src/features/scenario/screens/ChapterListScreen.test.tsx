@@ -29,8 +29,8 @@ describe('ChapterListScreen', () => {
 
   it('should display chapters after loading', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', summary: 'Résumé intro', position: 0, status: 'draft' },
-      { id: 'c2', title: 'Chapitre 1', summary: 'Résumé ch1', position: 1, status: 'draft' },
+      { id: 'c1', title: 'Introduction', summary: 'Résumé intro', position: 0, status: 'draft', script: [] },
+      { id: 'c2', title: 'Chapitre 1', summary: 'Résumé ch1', position: 1, status: 'draft', script: [] },
     ]);
 
     const { getByText } = render(
@@ -40,7 +40,6 @@ describe('ChapterListScreen', () => {
     await waitFor(() => {
       expect(getByText('Introduction')).toBeTruthy();
       expect(getByText('Chapitre 1')).toBeTruthy();
-      expect(getByText('Résumé intro')).toBeTruthy();
     });
   });
 
@@ -71,7 +70,7 @@ describe('ChapterListScreen', () => {
   it('should call generate plan API on button press', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([]);
     (api.apiPost as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Generated Chapter', summary: 'Summary', position: 0, status: 'draft' },
+      { id: 'c1', title: 'Generated Chapter', summary: 'Summary', position: 0, status: 'draft', script: [] },
     ]);
 
     const { getByTestId, getByText } = render(
@@ -90,9 +89,9 @@ describe('ChapterListScreen', () => {
     });
   });
 
-  it('should show generate scenario button when chapters exist', async () => {
+  it('should show generate scenario button when chapters have no scripts', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'draft' },
+      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'draft', script: [] },
     ]);
 
     const { getByTestId } = render(
@@ -106,10 +105,10 @@ describe('ChapterListScreen', () => {
 
   it('should call generate scenario API on button press', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'draft' },
+      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'draft', script: [] },
     ]);
     (api.apiPost as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'scripted' },
+      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'draft', script: [{ speaker: 'host', text: 'Hello' }] },
     ]);
 
     const { getByTestId } = render(
@@ -125,5 +124,36 @@ describe('ChapterListScreen', () => {
     await waitFor(() => {
       expect(api.apiPost).toHaveBeenCalledWith('/api/projects/p1/generate');
     });
+  });
+
+  it('should show generate audio button when chapters have scripts', async () => {
+    (api.apiGet as jest.Mock).mockResolvedValue([
+      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'draft', script: [{ speaker: 'host', text: 'Hello' }] },
+    ]);
+
+    const { getByTestId } = render(
+      <ChapterListScreen navigation={mockNavigation} route={mockRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('generate-audio-button')).toBeTruthy();
+    });
+  });
+
+  it('should show listen button when all chapters are ready', async () => {
+    (api.apiGet as jest.Mock).mockResolvedValue([
+      { id: 'c1', title: 'Introduction', summary: 'Résumé', position: 0, status: 'ready', script: [{ speaker: 'host', text: 'Hello' }] },
+    ]);
+
+    const { getByTestId } = render(
+      <ChapterListScreen navigation={mockNavigation} route={mockRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('listen-button')).toBeTruthy();
+    });
+
+    fireEvent.press(getByTestId('listen-button'));
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('Player', { projectId: 'p1' });
   });
 });

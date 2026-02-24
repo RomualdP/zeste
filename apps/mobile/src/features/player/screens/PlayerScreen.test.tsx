@@ -29,8 +29,8 @@ describe('PlayerScreen', () => {
 
   it('should display chapters playlist after loading', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3' },
-      { id: 'c2', title: 'Chapitre 1', status: 'ready', position: 1, audioPath: 'p1/c2.mp3' },
+      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3', script: [] },
+      { id: 'c2', title: 'Chapitre 1', status: 'ready', position: 1, audioPath: 'p1/c2.mp3', script: [] },
     ]);
 
     const { getAllByText, getByText } = render(
@@ -45,7 +45,7 @@ describe('PlayerScreen', () => {
 
   it('should show current chapter title', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3' },
+      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3', script: [] },
     ]);
 
     const { getByTestId } = render(
@@ -59,7 +59,7 @@ describe('PlayerScreen', () => {
 
   it('should show play/pause button', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3' },
+      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3', script: [] },
     ]);
 
     const { getByTestId } = render(
@@ -73,8 +73,8 @@ describe('PlayerScreen', () => {
 
   it('should show next/previous buttons', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3' },
-      { id: 'c2', title: 'Chapitre 1', status: 'ready', position: 1, audioPath: 'p1/c2.mp3' },
+      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3', script: [] },
+      { id: 'c2', title: 'Chapitre 1', status: 'ready', position: 1, audioPath: 'p1/c2.mp3', script: [] },
     ]);
 
     const { getByTestId } = render(
@@ -89,7 +89,7 @@ describe('PlayerScreen', () => {
 
   it('should show message when no audio chapters available', async () => {
     (api.apiGet as jest.Mock).mockResolvedValue([
-      { id: 'c1', title: 'Introduction', status: 'draft', position: 0, audioPath: null },
+      { id: 'c1', title: 'Introduction', status: 'draft', position: 0, audioPath: null, script: [] },
     ]);
 
     const { getByText } = render(
@@ -98,6 +98,21 @@ describe('PlayerScreen', () => {
 
     await waitFor(() => {
       expect(getByText('Aucun audio disponible')).toBeTruthy();
+    });
+  });
+
+  it('should show progress bar', async () => {
+    (api.apiGet as jest.Mock).mockResolvedValue([
+      { id: 'c1', title: 'Introduction', status: 'ready', position: 0, audioPath: 'p1/c1.mp3', script: [] },
+    ]);
+
+    const { getAllByText } = render(
+      <PlayerScreen navigation={mockNavigation} route={mockRoute} />,
+    );
+
+    await waitFor(() => {
+      // Both position (0:00) and duration (0:00) are shown
+      expect(getAllByText('0:00').length).toBe(2);
     });
   });
 });

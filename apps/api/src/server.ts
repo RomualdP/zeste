@@ -20,19 +20,19 @@ async function start() {
 
   const app = createApp({
     authService: new SupabaseAuthService(supabaseClient, supabaseServiceClient),
-    userRepository: new SupabaseUserRepository(supabaseClient),
-    projectRepository: new SupabaseProjectRepository(supabaseClient),
-    sourceRepository: new SupabaseSourceRepository(supabaseClient),
+    userRepository: new SupabaseUserRepository(supabaseServiceClient),
+    projectRepository: new SupabaseProjectRepository(supabaseServiceClient),
+    sourceRepository: new SupabaseSourceRepository(supabaseServiceClient),
     ingestionService: new JinaIngestionService(process.env.JINA_API_KEY!),
-    chapterRepository: new SupabaseChapterRepository(supabaseClient),
+    chapterRepository: new SupabaseChapterRepository(supabaseServiceClient),
     llmService: new MistralLlmService(process.env.MISTRAL_API_KEY!),
     ttsService: new FishAudioTtsService(
       process.env.FISH_AUDIO_API_KEY!,
       process.env.FISH_AUDIO_HOST_VOICE_ID ?? '',
       process.env.FISH_AUDIO_EXPERT_VOICE_ID ?? '',
     ),
-    audioStorage: new SupabaseAudioStorage(supabaseClient),
-    sharedLinkRepository: new SupabaseSharedLinkRepository(supabaseClient),
+    audioStorage: new SupabaseAudioStorage(supabaseServiceClient),
+    sharedLinkRepository: new SupabaseSharedLinkRepository(supabaseServiceClient),
   });
 
   try {

@@ -97,6 +97,53 @@ describe('ProjectDetailScreen', () => {
     });
   });
 
+  it('should show generate button when project has sources', async () => {
+    (api.apiGet as jest.Mock)
+      .mockResolvedValueOnce({
+        id: 'p1',
+        name: 'Mon Podcast',
+        status: 'draft',
+        tone: 'pedagogue',
+        targetDuration: 15,
+        chapterCount: 3,
+      })
+      .mockResolvedValueOnce([
+        { id: 's1', type: 'url', url: 'https://example.com', status: 'ingested' },
+      ]);
+
+    const { getByTestId } = render(
+      <ProjectDetailScreen navigation={mockNavigation} route={baseRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('chapters-button')).toBeTruthy();
+    });
+
+    fireEvent.press(getByTestId('chapters-button'));
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('ChapterList', { projectId: 'p1' });
+  });
+
+  it('should not show generate button when project has no sources', async () => {
+    (api.apiGet as jest.Mock)
+      .mockResolvedValueOnce({
+        id: 'p1',
+        name: 'Mon Podcast',
+        status: 'draft',
+        tone: 'pedagogue',
+        targetDuration: 15,
+        chapterCount: 3,
+      })
+      .mockResolvedValueOnce([]);
+
+    const { queryByTestId } = render(
+      <ProjectDetailScreen navigation={mockNavigation} route={baseRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(queryByTestId('chapters-button')).toBeNull();
+    });
+  });
+
   it('should navigate to AddSource on add button press', async () => {
     (api.apiGet as jest.Mock)
       .mockResolvedValueOnce({

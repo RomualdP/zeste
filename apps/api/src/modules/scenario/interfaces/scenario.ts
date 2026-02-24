@@ -19,6 +19,8 @@ function serializeChapter(chapter: {
   summary: string;
   position: number;
   script: unknown[];
+  audioPath: string | null;
+  audioDuration: number | null;
   status: string;
   createdAt: string;
 }) {
@@ -29,6 +31,8 @@ function serializeChapter(chapter: {
     summary: chapter.summary,
     position: chapter.position,
     script: chapter.script,
+    audioPath: chapter.audioPath,
+    audioDuration: chapter.audioDuration,
     status: chapter.status,
     createdAt: chapter.createdAt,
   };

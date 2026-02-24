@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../../../shared/services/supabase';
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+
 interface AuthState {
   session: Session | null;
   user: User | null;
@@ -27,9 +29,17 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) throw error;
+  const signUp = useCallback(async (email: string, password: string, displayName: string) => {
+    // Call the backend which creates both auth.users AND public.users rows
+    const response = await fetch(`${API_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, displayName }),
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err?.error?.message ?? 'Registration failed');
+    }
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {

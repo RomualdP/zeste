@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { SoundWave } from '../components/SoundWave';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { apiGet } from '../../../shared/services/api';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -10,6 +11,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'Player'>;
 
 export function PlayerScreen({ route }: Props) {
   const { projectId } = route.params;
+  const { width: screenWidth } = useWindowDimensions();
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -132,6 +134,10 @@ export function PlayerScreen({ route }: Props) {
           {current?.title}
         </Text>
 
+        <View style={styles.waveContainer}>
+          <SoundWave width={screenWidth} height={180} isPlaying={status.playing} />
+        </View>
+
         {/* Progress bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
@@ -211,7 +217,8 @@ const styles = StyleSheet.create({
   emptyText: { textAlign: 'center', marginTop: 48, color: '#888', fontSize: 16 },
   playerSection: { alignItems: 'center', paddingVertical: 32, paddingHorizontal: 24, backgroundColor: '#f8f8f8' },
   nowPlaying: { fontSize: 12, color: '#888', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
-  chapterTitle: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 16 },
+  chapterTitle: { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 8 },
+  waveContainer: { marginHorizontal: -24, marginBottom: 16 },
   progressContainer: { width: '100%', marginBottom: 16 },
   progressBar: { height: 4, backgroundColor: '#ddd', borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: '#FF6B35', borderRadius: 2 },

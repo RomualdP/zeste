@@ -4,6 +4,9 @@ import { PlayerScreen } from './PlayerScreen';
 import * as api from '../../../shared/services/api';
 
 jest.mock('../../../shared/services/api');
+jest.mock('../components/SoundWave', () => ({
+  SoundWave: () => null,
+}));
 
 const mockNavigation = {
   goBack: jest.fn(),

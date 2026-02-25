@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Alert } from 'react-native';
 import { apiGet, apiDelete } from '../../../shared/services/api';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainStackParamList } from '../../../navigation/types';
@@ -62,6 +62,28 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
   const handleDeleteSource = async (sourceId: string) => {
     await apiDelete(`/api/projects/${projectId}/sources/${sourceId}`);
     setSources((prev) => prev.filter((s) => s.id !== sourceId));
+  };
+
+  const handleDeleteProject = () => {
+    Alert.alert(
+      'Supprimer le projet',
+      'Cette action est irréversible. Toutes les sources, chapitres et audio seront supprimés.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await apiDelete(`/api/projects/${projectId}`);
+              navigation.navigate('ProjectList');
+            } catch (err: any) {
+              Alert.alert('Erreur', err.message);
+            }
+          },
+        },
+      ],
+    );
   };
 
   if (!project) {
@@ -152,6 +174,14 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
         </TouchableOpacity>
       )}
 
+      <TouchableOpacity
+        style={styles.deleteProjectButton}
+        onPress={handleDeleteProject}
+        testID="delete-project-button"
+      >
+        <Text style={styles.deleteProjectText}>Supprimer le projet</Text>
+      </TouchableOpacity>
+
       {project.status === 'ready' && (
         <>
           <TouchableOpacity
@@ -196,4 +226,6 @@ const styles = StyleSheet.create({
   listenButton: { backgroundColor: '#4CAF50' },
   shareButton: { backgroundColor: '#2196F3' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  deleteProjectButton: { borderWidth: 1, borderColor: '#FF3B30', borderRadius: 8, padding: 16, alignItems: 'center', marginTop: 32 },
+  deleteProjectText: { color: '#FF3B30', fontSize: 16, fontWeight: '600' },
 });

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Alert } from 'react-native';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { ProjectDetailScreen } from './ProjectDetailScreen';
 import * as api from '../../../shared/services/api';
@@ -166,5 +167,91 @@ describe('ProjectDetailScreen', () => {
 
     fireEvent.press(getByTestId('add-source-button'));
     expect(mockNavigation.navigate).toHaveBeenCalledWith('AddSource', { projectId: 'p1' });
+  });
+
+  it('should show delete project button', async () => {
+    (api.apiGet as jest.Mock)
+      .mockResolvedValueOnce({
+        id: 'p1',
+        name: 'Mon Podcast',
+        status: 'draft',
+        tone: 'pedagogue',
+        targetDuration: 15,
+        chapterCount: 3,
+      })
+      .mockResolvedValueOnce([]);
+
+    const { getByTestId } = render(
+      <ProjectDetailScreen navigation={mockNavigation} route={baseRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('delete-project-button')).toBeTruthy();
+    });
+  });
+
+  it('should show confirmation alert on delete press', async () => {
+    jest.spyOn(Alert, 'alert');
+    (api.apiGet as jest.Mock)
+      .mockResolvedValueOnce({
+        id: 'p1',
+        name: 'Mon Podcast',
+        status: 'draft',
+        tone: 'pedagogue',
+        targetDuration: 15,
+        chapterCount: 3,
+      })
+      .mockResolvedValueOnce([]);
+
+    const { getByTestId } = render(
+      <ProjectDetailScreen navigation={mockNavigation} route={baseRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('delete-project-button')).toBeTruthy();
+    });
+
+    fireEvent.press(getByTestId('delete-project-button'));
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Supprimer le projet',
+      'Cette action est irréversible. Toutes les sources, chapitres et audio seront supprimés.',
+      expect.arrayContaining([
+        expect.objectContaining({ text: 'Annuler', style: 'cancel' }),
+        expect.objectContaining({ text: 'Supprimer', style: 'destructive' }),
+      ]),
+    );
+  });
+
+  it('should delete project and navigate back on confirm', async () => {
+    jest.spyOn(Alert, 'alert').mockImplementation((_title, _msg, buttons) => {
+      const confirmButton = buttons?.find((b: any) => b.style === 'destructive');
+      confirmButton?.onPress?.();
+    });
+    (api.apiGet as jest.Mock)
+      .mockResolvedValueOnce({
+        id: 'p1',
+        name: 'Mon Podcast',
+        status: 'draft',
+        tone: 'pedagogue',
+        targetDuration: 15,
+        chapterCount: 3,
+      })
+      .mockResolvedValueOnce([]);
+    (api.apiDelete as jest.Mock).mockResolvedValueOnce(undefined);
+
+    const { getByTestId } = render(
+      <ProjectDetailScreen navigation={mockNavigation} route={baseRoute} />,
+    );
+
+    await waitFor(() => {
+      expect(getByTestId('delete-project-button')).toBeTruthy();
+    });
+
+    fireEvent.press(getByTestId('delete-project-button'));
+
+    await waitFor(() => {
+      expect(api.apiDelete).toHaveBeenCalledWith('/api/projects/p1');
+      expect(mockNavigation.navigate).toHaveBeenCalledWith('ProjectList');
+    });
   });
 });

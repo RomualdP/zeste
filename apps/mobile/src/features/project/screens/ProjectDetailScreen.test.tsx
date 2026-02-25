@@ -45,7 +45,7 @@ describe('ProjectDetailScreen', () => {
 
     await waitFor(() => {
       expect(getByText('Mon Podcast')).toBeTruthy();
-      expect(getByText('draft')).toBeTruthy();
+      expect(getByText('Brouillon')).toBeTruthy();
     });
   });
 

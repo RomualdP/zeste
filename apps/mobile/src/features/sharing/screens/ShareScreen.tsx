@@ -8,7 +8,7 @@ import type { SharedLink } from '@zeste/shared';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Share'>;
 
-const WEB_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+const WEB_BASE_URL = process.env.EXPO_PUBLIC_WEB_URL ?? process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5173';
 
 export function ShareScreen({ route }: Props) {
   const { projectId } = route.params;
@@ -16,7 +16,7 @@ export function ShareScreen({ route }: Props) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareUrl = link ? `${WEB_BASE_URL}/shared/${link.slug}` : null;
+  const shareUrl = link ? `${WEB_BASE_URL}/${link.slug}` : null;
 
   const handleCreateLink = async () => {
     setLoading(true);

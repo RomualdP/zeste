@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
-import { apiPatch } from '../../../shared/services/api';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import { apiGet, apiPatch } from '../../../shared/services/api';
 import { Tone, TargetDuration, AUDIO } from '@zeste/shared';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainStackParamList } from '../../../navigation/types';
@@ -27,6 +27,21 @@ export function ConfigureScreen({ route, navigation }: Props) {
   const [duration, setDuration] = useState<number>(TargetDuration.Medium);
   const [chapters, setChapters] = useState<number>(AUDIO.DEFAULT_CHAPTERS[TargetDuration.Medium]);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  // Load current project configuration
+  useEffect(() => {
+    apiGet<Project>(`/api/projects/${projectId}`)
+      .then((project) => {
+        setTone(project.tone);
+        setDuration(project.targetDuration);
+        setChapters(project.chapterCount);
+      })
+      .catch(() => {
+        // Keep defaults on error
+      })
+      .finally(() => setInitialLoading(false));
+  }, [projectId]);
 
   const maxChapters = AUDIO.MAX_CHAPTERS_PER_DURATION[duration as keyof typeof AUDIO.MAX_CHAPTERS_PER_DURATION] ?? AUDIO.MAX_CHAPTERS;
 
@@ -50,6 +65,14 @@ export function ConfigureScreen({ route, navigation }: Props) {
       setLoading(false);
     }
   };
+
+  if (initialLoading) {
+    return (
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color="#FF6B35" />
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -116,6 +139,7 @@ export function ConfigureScreen({ route, navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, backgroundColor: '#fff' },
+  centered: { justifyContent: 'center', alignItems: 'center' },
   sectionTitle: { fontSize: 18, fontWeight: '600', marginTop: 16, marginBottom: 12 },
   options: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   option: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, borderWidth: 1, borderColor: '#ddd' },

@@ -3,11 +3,13 @@ import { CreateSharedLink } from '../application/use-cases/create-shared-link';
 import { GetSharedLink } from '../application/use-cases/get-shared-link';
 import { DeactivateSharedLink } from '../application/use-cases/deactivate-shared-link';
 import type { SharedLinkRepositoryPort } from '../application/ports/shared-link-repository.port';
+import type { AudioStoragePort } from '../../audio/application/ports/audio-storage.port';
 import { requireAuth } from '../../../shared/middlewares/require-auth';
 
 declare module 'fastify' {
   interface FastifyInstance {
     sharedLinkRepository: SharedLinkRepositoryPort;
+    audioStorage: AudioStoragePort;
   }
 }
 
@@ -53,6 +55,19 @@ export const sharingRoutes: FastifyPluginAsync = async (app) => {
       );
       const result = await useCase.execute({ slug });
 
+      // Generate signed audio URLs for each chapter
+      const chaptersWithUrls = await Promise.all(
+        result.chapters.map(async (ch) => ({
+          id: ch.id,
+          title: ch.title,
+          summary: ch.summary,
+          position: ch.position,
+          audioPath: ch.audioPath,
+          audioDuration: ch.audioDuration,
+          audioUrl: ch.audioPath ? await app.audioStorage.getUrl(ch.audioPath) : null,
+        })),
+      );
+
       return reply.status(200).send({
         data: {
           project: {
@@ -61,14 +76,7 @@ export const sharingRoutes: FastifyPluginAsync = async (app) => {
             tone: result.project.tone,
             targetDuration: result.project.targetDuration,
           },
-          chapters: result.chapters.map((ch) => ({
-            id: ch.id,
-            title: ch.title,
-            summary: ch.summary,
-            position: ch.position,
-            audioPath: ch.audioPath,
-            audioDuration: ch.audioDuration,
-          })),
+          chapters: chaptersWithUrls,
         },
       });
     } catch (err: any) {

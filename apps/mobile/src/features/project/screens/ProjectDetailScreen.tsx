@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { apiGet, apiDelete } from '../../../shared/services/api';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { MainStackParamList } from '../../../navigation/types';
@@ -7,10 +7,31 @@ import type { Project, Source } from '@zeste/shared';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'ProjectDetail'>;
 
+const STATUS_LABELS: Record<string, string> = {
+  draft: 'Brouillon',
+  processing: 'En cours...',
+  ready: 'Prêt',
+  error: 'Erreur',
+};
+
+const TONE_LABELS: Record<string, string> = {
+  pedagogue: 'Pédagogue',
+  debate: 'Débat',
+  vulgarization: 'Vulgarisation',
+  interview: 'Interview',
+};
+
+const SOURCE_STATUS_LABELS: Record<string, string> = {
+  pending: 'En attente',
+  ingested: 'Prêt',
+  error: 'Erreur',
+};
+
 export function ProjectDetailScreen({ route, navigation }: Props) {
   const { projectId } = route.params;
   const [project, setProject] = useState<Project | null>(null);
   const [sources, setSources] = useState<Source[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     const [proj, srcs] = await Promise.all([
@@ -29,6 +50,15 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
     return navigation.addListener('focus', loadData);
   }, [navigation, loadData]);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadData]);
+
   const handleDeleteSource = async (sourceId: string) => {
     await apiDelete(`/api/projects/${projectId}/sources/${sourceId}`);
     setSources((prev) => prev.filter((s) => s.id !== sourceId));
@@ -43,15 +73,25 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#FF6B35"
+          colors={['#FF6B35']}
+        />
+      }
+    >
       <Text style={styles.title}>{project.name}</Text>
       <View style={styles.info}>
         <Text style={styles.label}>Statut</Text>
-        <Text style={styles.value}>{project.status}</Text>
+        <Text style={styles.value}>{STATUS_LABELS[project.status] ?? project.status}</Text>
       </View>
       <View style={styles.info}>
         <Text style={styles.label}>Ton</Text>
-        <Text style={styles.value}>{project.tone}</Text>
+        <Text style={styles.value}>{TONE_LABELS[project.tone] ?? project.tone}</Text>
       </View>
       <View style={styles.info}>
         <Text style={styles.label}>Durée cible</Text>
@@ -72,7 +112,9 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
               <Text style={styles.sourceUrl} numberOfLines={1}>
                 {source.url ?? source.filePath ?? 'Source'}
               </Text>
-              <Text style={styles.sourceStatus}>{source.status}</Text>
+              <Text style={[styles.sourceStatus, source.status === 'error' && styles.sourceStatusError]}>
+                {SOURCE_STATUS_LABELS[source.status] ?? source.status}
+              </Text>
             </View>
             <TouchableOpacity
               onPress={() => handleDeleteSource(source.id)}
@@ -138,13 +180,14 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 24 },
   info: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
   label: { fontSize: 14, color: '#666' },
-  value: { fontSize: 14, fontWeight: '600', textTransform: 'capitalize' },
+  value: { fontSize: 14, fontWeight: '600' },
   sectionTitle: { fontSize: 18, fontWeight: '600', marginTop: 24, marginBottom: 12 },
   emptyText: { color: '#888', fontSize: 14, marginBottom: 12 },
   sourceCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8f8f8', padding: 12, borderRadius: 8, marginBottom: 8 },
   sourceInfo: { flex: 1, marginRight: 12 },
   sourceUrl: { fontSize: 14, fontWeight: '500' },
-  sourceStatus: { fontSize: 12, color: '#888', marginTop: 2, textTransform: 'capitalize' },
+  sourceStatus: { fontSize: 12, color: '#4CAF50', marginTop: 2 },
+  sourceStatusError: { color: '#f44336' },
   deleteText: { color: '#FF3B30', fontSize: 14, fontWeight: '500' },
   addSourceButton: { borderWidth: 1, borderColor: '#FF6B35', borderRadius: 8, padding: 12, alignItems: 'center', marginTop: 8, borderStyle: 'dashed' },
   addSourceText: { color: '#FF6B35', fontSize: 14, fontWeight: '600' },

@@ -8,6 +8,7 @@ import type { UserRepositoryPort } from '../../identity/application/ports/user-r
 import type { ProjectRepositoryPort } from '../../project/application/ports/project-repository.port';
 import type { ChapterRepositoryPort } from '../../scenario/application/ports/chapter-repository.port';
 import type { SharedLinkRepositoryPort } from '../application/ports/shared-link-repository.port';
+import type { AudioStoragePort } from '../../audio/application/ports/audio-storage.port';
 
 function createMocks() {
   const project = ProjectEntity.create('p1', 'user-1', 'Test')
@@ -60,6 +61,12 @@ function createMocks() {
       save: vi.fn(),
       delete: vi.fn(),
     } as SharedLinkRepositoryPort,
+
+    audioStorage: {
+      upload: vi.fn(),
+      getUrl: vi.fn().mockResolvedValue('https://storage.example.com/signed-audio-url'),
+      delete: vi.fn(),
+    } as AudioStoragePort,
   };
 }
 
@@ -70,6 +77,7 @@ async function buildApp(mocks: ReturnType<typeof createMocks>) {
   app.decorate('projectRepository', mocks.projectRepository);
   app.decorate('chapterRepository', mocks.chapterRepository);
   app.decorate('sharedLinkRepository', mocks.sharedLinkRepository);
+  app.decorate('audioStorage', mocks.audioStorage);
   app.register(sharingRoutes);
   return app;
 }

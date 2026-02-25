@@ -2,8 +2,11 @@
   "name": "@zeste/web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "echo 'web build not configured yet'",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
@@ -11,10 +14,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@zeste/shared": "workspace:*"
+    "@zeste/shared": "workspace:*",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
     "typescript": "^5.7.0",
+    "vite": "^7.3.1",
     "vitest": "^3.0.0"
   }
 }

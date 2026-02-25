@@ -41,6 +41,7 @@ export class GenerateScenario {
 
     const totalWords = AUDIO.TARGET_WORDS[project.targetDuration];
     const wordsPerChapter = Math.round(totalWords / chapters.length);
+    console.log('[SCENARIO] Target:', { targetDuration: project.targetDuration, totalWords, chapters: chapters.length, wordsPerChapter });
 
     // Sort chapters by position
     const sortedChapters = [...chapters].sort((a, b) => a.position - b.position);
@@ -59,6 +60,9 @@ export class GenerateScenario {
         targetWordCount: wordsPerChapter,
         previousChaptersContext,
       });
+
+      const wordCount = script.reduce((sum, entry) => sum + entry.text.split(/\s+/).length, 0);
+      console.log(`[SCENARIO] Chapter "${chapter.title}": ${script.length} entries, ${wordCount} words (target: ${wordsPerChapter})`);
 
       const updated = chapter.setScript(script);
       await this.chapterRepository.save(updated);

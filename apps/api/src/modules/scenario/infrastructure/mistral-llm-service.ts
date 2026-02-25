@@ -38,12 +38,19 @@ Le plan doit contenir exactement ${input.chapterCount} chapitres.`;
     targetWordCount: number;
     previousChaptersContext: string[];
   }): Promise<ScriptEntry[]> {
+    const minEntries = Math.max(8, Math.round(input.targetWordCount / 50));
     const systemPrompt = `Tu es un scénariste de podcast en français avec deux intervenants : "host" (l'hôte) et "expert" (l'invité expert).
 ${TONE_INSTRUCTIONS[input.tone] ?? ''}
-Génère un script de dialogue naturel pour un chapitre de podcast.
-Le script doit faire environ ${input.targetWordCount} mots au total.
-Réponds UNIQUEMENT avec un tableau JSON valide de la forme : [{"speaker": "host"|"expert", "text": "...", "tone": "..."}]
-Alterne les prises de parole de manière naturelle. Chaque entrée fait 2-4 phrases.`;
+Génère un script de dialogue naturel et COMPLET pour un chapitre de podcast.
+
+CONTRAINTES IMPORTANTES :
+- Le script DOIT faire au minimum ${input.targetWordCount} mots au total. C'est une contrainte stricte.
+- Le script DOIT contenir au minimum ${minEntries} prises de parole alternées.
+- Chaque prise de parole fait 3-6 phrases détaillées (pas de réponses courtes).
+- Développe les idées en profondeur : exemples concrets, anecdotes, explications détaillées.
+- Ne résume pas, ne condense pas. Le but est de produire un contenu riche et long.
+
+Réponds UNIQUEMENT avec un tableau JSON valide de la forme : [{"speaker": "host"|"expert", "text": "...", "tone": "..."}]`;
 
     let userPrompt = `Chapitre : ${input.chapterTitle}\nRésumé : ${input.chapterSummary}\n\nSources :\n${input.sources.join('\n\n---\n\n')}`;
 
@@ -55,7 +62,7 @@ Alterne les prises de parole de manière naturelle. Chaque entrée fait 2-4 phra
     return JSON.parse(content) as ScriptEntry[];
   }
 
-  private async callMistral(systemPrompt: string, userPrompt: string): Promise<string> {
+  private async callMistral(systemPrompt: string, userPrompt: string, maxTokens = 16000): Promise<string> {
     const response = await fetch(MISTRAL_API_URL, {
       method: 'POST',
       headers: {
@@ -70,6 +77,7 @@ Alterne les prises de parole de manière naturelle. Chaque entrée fait 2-4 phra
         ],
         response_format: { type: 'json_object' },
         temperature: 0.7,
+        max_tokens: maxTokens,
       }),
     });
 

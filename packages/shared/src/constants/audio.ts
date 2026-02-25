@@ -1,11 +1,11 @@
 export const AUDIO = {
-  WORDS_PER_MINUTE: 150,
+  WORDS_PER_MINUTE: 120,
   SILENCE_BETWEEN_REPLIES_MS: 300,
   MP3_BITRATE: 128,
   TARGET_WORDS: {
-    5: 750,
-    15: 2250,
-    30: 4500,
+    5: 600,
+    15: 1800,
+    30: 3600,
   },
   DEFAULT_CHAPTERS: {
     5: 1,

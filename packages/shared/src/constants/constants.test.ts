@@ -12,13 +12,13 @@ describe('QUOTAS', () => {
 
 describe('AUDIO', () => {
   it('should define words per minute for spoken content', () => {
-    expect(AUDIO.WORDS_PER_MINUTE).toBe(150);
+    expect(AUDIO.WORDS_PER_MINUTE).toBe(120);
   });
 
   it('should define target words matching PRD duration mapping', () => {
-    expect(AUDIO.TARGET_WORDS[5]).toBe(750);
-    expect(AUDIO.TARGET_WORDS[15]).toBe(2250);
-    expect(AUDIO.TARGET_WORDS[30]).toBe(4500);
+    expect(AUDIO.TARGET_WORDS[5]).toBe(600);
+    expect(AUDIO.TARGET_WORDS[15]).toBe(1800);
+    expect(AUDIO.TARGET_WORDS[30]).toBe(3600);
   });
 
   it('should have consistent target words (duration * words_per_minute)', () => {

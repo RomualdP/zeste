@@ -1,5 +1,5 @@
 import { Entity } from '../base';
-import { ProjectStatus, Tone, TargetDuration, AUDIO } from '@zeste/shared';
+import { ProjectStatus, Tone, TargetDuration, AUDIO, defaultChapters } from '@zeste/shared';
 
 interface ProjectProps {
   userId: string;
@@ -41,7 +41,7 @@ export class ProjectEntity extends Entity {
       name,
       tone: Tone.Pedagogue,
       targetDuration: TargetDuration.Medium,
-      chapterCount: AUDIO.DEFAULT_CHAPTERS[TargetDuration.Medium],
+      chapterCount: defaultChapters(TargetDuration.Medium),
       status: ProjectStatus.Draft,
       createdAt: now,
       updatedAt: now,

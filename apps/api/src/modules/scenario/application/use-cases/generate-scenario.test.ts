@@ -5,7 +5,7 @@ import type { SourceRepositoryPort } from '../../../project/application/ports/so
 import type { ChapterRepositoryPort } from '../ports/chapter-repository.port';
 import type { LlmServicePort } from '../ports/llm-service.port';
 import { ProjectEntity, SourceEntity, ChapterEntity } from '@zeste/domain';
-import { Tone, TargetDuration, AUDIO } from '@zeste/shared';
+import { Tone, TargetDuration, targetWords } from '@zeste/shared';
 
 describe('GenerateScenario', () => {
   let useCase: GenerateScenario;
@@ -79,7 +79,7 @@ describe('GenerateScenario', () => {
   it('should pass correct word count target per chapter', async () => {
     await useCase.execute({ userId: 'user-1', projectId: 'p1' });
 
-    const totalWords = AUDIO.TARGET_WORDS[TargetDuration.Medium];
+    const totalWords = targetWords(TargetDuration.Medium);
     const wordsPerChapter = Math.round(totalWords / 3);
 
     const call = vi.mocked(llmService.generateChapterScript).mock.calls[0]!;

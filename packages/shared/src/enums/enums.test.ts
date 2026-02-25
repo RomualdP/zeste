@@ -42,10 +42,15 @@ describe('Tone', () => {
 });
 
 describe('TargetDuration', () => {
-  it('should have 5, 15, and 30 minute durations', () => {
+  it('should have convenience constants for common durations', () => {
     expect(TargetDuration.Short).toBe(5);
     expect(TargetDuration.Medium).toBe(15);
     expect(TargetDuration.Long).toBe(30);
+  });
+
+  it('should define min and max boundaries', () => {
+    expect(TargetDuration.Min).toBe(5);
+    expect(TargetDuration.Max).toBe(60);
   });
 });
 

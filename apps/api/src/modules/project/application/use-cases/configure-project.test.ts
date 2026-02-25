@@ -3,7 +3,7 @@ import { ConfigureProject } from './configure-project';
 import type { ProjectRepositoryPort } from '../ports/project-repository.port';
 import type { SourceRepositoryPort } from '../ports/source-repository.port';
 import { ProjectEntity, SourceEntity } from '@zeste/domain';
-import { Tone, TargetDuration } from '@zeste/shared';
+import { Tone, maxChaptersForDuration } from '@zeste/shared';
 
 describe('ConfigureProject', () => {
   let useCase: ConfigureProject;
@@ -33,27 +33,40 @@ describe('ConfigureProject', () => {
       userId: 'user-1',
       projectId: 'p1',
       tone: Tone.Debate,
-      targetDuration: TargetDuration.Long,
+      targetDuration: 30,
       chapterCount: 5,
     });
 
     expect(result.tone).toBe(Tone.Debate);
-    expect(result.targetDuration).toBe(TargetDuration.Long);
+    expect(result.targetDuration).toBe(30);
     expect(result.chapterCount).toBe(5);
     expect(projectRepository.save).toHaveBeenCalled();
+  });
+
+  it('should accept any duration between 5 and 60', async () => {
+    const result = await useCase.execute({
+      userId: 'user-1',
+      projectId: 'p1',
+      tone: Tone.Pedagogue,
+      targetDuration: 23,
+      chapterCount: 2,
+    });
+
+    expect(result.targetDuration).toBe(23);
+    expect(result.chapterCount).toBe(2);
   });
 
   it('should reject when project not found', async () => {
     vi.mocked(projectRepository.findById).mockResolvedValue(null);
 
     await expect(
-      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: TargetDuration.Medium, chapterCount: 3 }),
+      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: 15, chapterCount: 3 }),
     ).rejects.toThrow('Project not found');
   });
 
   it('should reject when user does not own the project', async () => {
     await expect(
-      useCase.execute({ userId: 'other-user', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: TargetDuration.Medium, chapterCount: 3 }),
+      useCase.execute({ userId: 'other-user', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: 15, chapterCount: 3 }),
     ).rejects.toThrow('Project not found');
   });
 
@@ -61,31 +74,39 @@ describe('ConfigureProject', () => {
     vi.mocked(sourceRepository.findByProjectId).mockResolvedValue([]);
 
     await expect(
-      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: TargetDuration.Medium, chapterCount: 3 }),
+      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: 15, chapterCount: 3 }),
     ).rejects.toThrow('at least one ingested source');
   });
 
-  it('should reject when chapter count exceeds max for duration (5min → max 2)', async () => {
+  it('should reject duration below minimum', async () => {
     await expect(
-      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: TargetDuration.Short, chapterCount: 3 }),
-    ).rejects.toThrow('Maximum 2 chapters');
+      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: 3, chapterCount: 1 }),
+    ).rejects.toThrow('Duration must be between');
   });
 
-  it('should reject when chapter count exceeds max for duration (15min → max 4)', async () => {
+  it('should reject duration above maximum', async () => {
     await expect(
-      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: TargetDuration.Medium, chapterCount: 5 }),
-    ).rejects.toThrow('Maximum 4 chapters');
+      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: 90, chapterCount: 1 }),
+    ).rejects.toThrow('Duration must be between');
   });
 
-  it('should allow max chapters for 30min duration', async () => {
+  it('should reject when chapter count exceeds max for given duration', async () => {
+    const max5 = maxChaptersForDuration(5);
+    await expect(
+      useCase.execute({ userId: 'user-1', projectId: 'p1', tone: Tone.Pedagogue, targetDuration: 5, chapterCount: max5 + 1 }),
+    ).rejects.toThrow(`Maximum ${max5} chapters`);
+  });
+
+  it('should allow max chapters for 60min duration', async () => {
+    const max60 = maxChaptersForDuration(60);
     const result = await useCase.execute({
       userId: 'user-1',
       projectId: 'p1',
       tone: Tone.Interview,
-      targetDuration: TargetDuration.Long,
-      chapterCount: 6,
+      targetDuration: 60,
+      chapterCount: max60,
     });
 
-    expect(result.chapterCount).toBe(6);
+    expect(result.chapterCount).toBe(max60);
   });
 });

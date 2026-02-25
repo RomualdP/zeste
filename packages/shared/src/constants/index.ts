@@ -1,2 +1,2 @@
 export { QUOTAS } from './quotas';
-export { AUDIO } from './audio';
+export { AUDIO, targetWords, defaultChapters, maxChaptersForDuration } from './audio';

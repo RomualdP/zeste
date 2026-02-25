@@ -20,4 +20,4 @@ export type {
 } from './dtos';
 
 // Constants
-export { QUOTAS, AUDIO } from './constants';
+export { QUOTAS, AUDIO, targetWords, defaultChapters, maxChaptersForDuration } from './constants';

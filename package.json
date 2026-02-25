@@ -5,6 +5,10 @@
   "packageManager": "pnpm@9.15.4",
   "description": "AI Podcast Generator - Transform documents into personalized audio podcasts",
   "scripts": {
+    "start:mobile": "pnpm --filter @zeste/mobile start",
+    "start:mobile:tunnel": "pnpm --filter @zeste/mobile start -- --tunnel --clear",
+    "start:api": "pnpm --filter @zeste/api dev",
+    "start:web": "pnpm --filter @zeste/web dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",

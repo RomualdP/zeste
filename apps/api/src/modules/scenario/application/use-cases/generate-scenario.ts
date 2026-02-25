@@ -2,7 +2,7 @@ import type { ProjectRepositoryPort } from '../../../project/application/ports/p
 import type { SourceRepositoryPort } from '../../../project/application/ports/source-repository.port';
 import type { ChapterRepositoryPort } from '../ports/chapter-repository.port';
 import type { LlmServicePort } from '../ports/llm-service.port';
-import { SourceStatus, AUDIO } from '@zeste/shared';
+import { SourceStatus, targetWords } from '@zeste/shared';
 import type { ChapterEntity } from '@zeste/domain';
 
 interface GenerateScenarioInput {
@@ -39,7 +39,7 @@ export class GenerateScenario {
       .filter((s) => s.status === SourceStatus.Ingested)
       .map((s) => s.rawContent);
 
-    const totalWords = AUDIO.TARGET_WORDS[project.targetDuration];
+    const totalWords = targetWords(project.targetDuration);
     const wordsPerChapter = Math.round(totalWords / chapters.length);
     console.log('[SCENARIO] Target:', { targetDuration: project.targetDuration, totalWords, chapters: chapters.length, wordsPerChapter });
 

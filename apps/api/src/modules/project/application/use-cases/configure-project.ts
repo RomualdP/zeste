@@ -1,6 +1,6 @@
 import type { ProjectRepositoryPort } from '../ports/project-repository.port';
 import type { SourceRepositoryPort } from '../ports/source-repository.port';
-import { Tone, TargetDuration, SourceStatus, AUDIO } from '@zeste/shared';
+import { Tone, TargetDuration, SourceStatus, AUDIO, maxChaptersForDuration } from '@zeste/shared';
 import type { ProjectEntity } from '@zeste/domain';
 
 interface ConfigureProjectInput {
@@ -29,7 +29,11 @@ export class ConfigureProject {
       throw new Error('Project must have at least one ingested source');
     }
 
-    const maxChapters = AUDIO.MAX_CHAPTERS_PER_DURATION[input.targetDuration];
+    if (input.targetDuration < AUDIO.MIN_DURATION || input.targetDuration > AUDIO.MAX_DURATION) {
+      throw new Error(`Duration must be between ${AUDIO.MIN_DURATION} and ${AUDIO.MAX_DURATION} minutes`);
+    }
+
+    const maxChapters = maxChaptersForDuration(input.targetDuration);
     if (input.chapterCount > maxChapters) {
       throw new Error(`Maximum ${maxChapters} chapters for ${input.targetDuration}min duration`);
     }

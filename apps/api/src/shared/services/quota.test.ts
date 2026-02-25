@@ -24,12 +24,12 @@ describe('QuotaService', () => {
   });
 
   describe('checkDurationQuota', () => {
-    it('should allow 30 minutes or less', () => {
-      expect(() => QuotaService.checkDurationQuota(TargetDuration.Long)).not.toThrow();
+    it('should allow 60 minutes or less', () => {
+      expect(() => QuotaService.checkDurationQuota(60)).not.toThrow();
     });
 
-    it('should reject duration exceeding 30 minutes', () => {
-      expect(() => QuotaService.checkDurationQuota(45 as TargetDuration)).toThrow('Maximum 30 minutes');
+    it('should reject duration exceeding 60 minutes', () => {
+      expect(() => QuotaService.checkDurationQuota(90 as TargetDuration)).toThrow('Maximum 60 minutes');
     });
   });
 });

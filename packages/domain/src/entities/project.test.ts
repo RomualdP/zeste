@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ProjectEntity } from './project';
-import { ProjectStatus, Tone, TargetDuration, AUDIO } from '@zeste/shared';
+import { ProjectStatus, Tone, TargetDuration, defaultChapters } from '@zeste/shared';
 
 describe('ProjectEntity', () => {
   describe('create', () => {
@@ -12,7 +12,7 @@ describe('ProjectEntity', () => {
       expect(project.status).toBe(ProjectStatus.Draft);
       expect(project.tone).toBe(Tone.Pedagogue);
       expect(project.targetDuration).toBe(TargetDuration.Medium);
-      expect(project.chapterCount).toBe(AUDIO.DEFAULT_CHAPTERS[TargetDuration.Medium]);
+      expect(project.chapterCount).toBe(defaultChapters(TargetDuration.Medium));
     });
   });
 
@@ -37,7 +37,7 @@ describe('ProjectEntity', () => {
       expect(() => project.configure(Tone.Pedagogue, TargetDuration.Medium, 0)).toThrow(
         'Chapter count must be between',
       );
-      expect(() => project.configure(Tone.Pedagogue, TargetDuration.Medium, 7)).toThrow(
+      expect(() => project.configure(Tone.Pedagogue, TargetDuration.Medium, 11)).toThrow(
         'Chapter count must be between',
       );
     });

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Canvas, Path, Skia } from '@shopify/react-native-skia';
+import Svg, { Path } from 'react-native-svg';
 
 interface SoundWaveProps {
   width: number;
@@ -12,6 +12,31 @@ const WAVE_CONFIGS = [
   { color: 'rgba(34, 197, 94, 0.6)', frequency: 1.8, ampScale: 0.65, speed: 1.8, strokeWidth: 2 },
   { color: 'rgba(99, 102, 241, 0.7)', frequency: 1.5, ampScale: 0.8, speed: 1.5, strokeWidth: 2.5 },
 ];
+
+function buildWavePath(
+  width: number,
+  height: number,
+  config: (typeof WAVE_CONFIGS)[number],
+  phase: number,
+  amplitude: number,
+): string {
+  const mid = height / 2;
+  const maxAmp = height * 0.35 * config.ampScale * amplitude;
+  let d = `M 0 ${mid.toFixed(1)}`;
+
+  for (let x = 4; x <= width; x += 4) {
+    const nx = x / width;
+    const envelope = Math.sin(nx * Math.PI);
+    const y =
+      mid +
+      Math.sin(nx * config.frequency * Math.PI * 2 + phase * config.speed) *
+        maxAmp *
+        envelope;
+    d += ` L ${x} ${y.toFixed(1)}`;
+  }
+
+  return d;
+}
 
 export function SoundWave({ width, height, isPlaying }: SoundWaveProps) {
   const phaseRef = useRef(0);
@@ -48,37 +73,18 @@ export function SoundWave({ width, height, isPlaying }: SoundWaveProps) {
     };
   }, [isPlaying]);
 
-  const mid = height / 2;
-
   return (
-    <Canvas style={{ width, height }} testID="sound-wave">
-      {WAVE_CONFIGS.map((wave, i) => {
-        const path = Skia.Path.Make();
-        const maxAmp = height * 0.35 * wave.ampScale * amplitudeRef.current;
-
-        path.moveTo(0, mid);
-        for (let x = 4; x <= width; x += 4) {
-          const nx = x / width;
-          const envelope = Math.sin(nx * Math.PI);
-          const y =
-            mid +
-            Math.sin(nx * wave.frequency * Math.PI * 2 + phaseRef.current * wave.speed) *
-              maxAmp *
-              envelope;
-          path.lineTo(x, y);
-        }
-
-        return (
-          <Path
-            key={i}
-            path={path}
-            color={wave.color}
-            style="stroke"
-            strokeWidth={wave.strokeWidth}
-            strokeCap="round"
-          />
-        );
-      })}
-    </Canvas>
+    <Svg width={width} height={height} testID="sound-wave">
+      {WAVE_CONFIGS.map((wave, i) => (
+        <Path
+          key={i}
+          d={buildWavePath(width, height, wave, phaseRef.current, amplitudeRef.current)}
+          stroke={wave.color}
+          strokeWidth={wave.strokeWidth}
+          fill="none"
+          strokeLinecap="round"
+        />
+      ))}
+    </Svg>
   );
 }

@@ -2,6 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { CreateProject } from '../application/use-cases/create-project';
 import { GetUserProjects } from '../application/use-cases/get-user-projects';
 import { GetProject } from '../application/use-cases/get-project';
+import { DeleteProject } from '../application/use-cases/delete-project';
 import type { ProjectRepositoryPort } from '../application/ports/project-repository.port';
 import { requireAuth } from '../../../shared/middlewares/require-auth';
 
@@ -65,6 +66,21 @@ export const projectRoutes: FastifyPluginAsync = async (app) => {
       const useCase = new GetProject(app.projectRepository);
       const project = await useCase.execute({ projectId: id, userId: request.user!.id });
       return reply.status(200).send({ data: serializeProject(project) });
+    } catch (err: any) {
+      return reply.status(404).send({
+        error: { code: 'NOT_FOUND', message: err.message },
+      });
+    }
+  });
+
+  // DELETE /:id — delete project
+  app.delete('/:id', async (request, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+      const useCase = new DeleteProject(app.projectRepository);
+      await useCase.execute({ projectId: id, userId: request.user!.id });
+      return reply.status(204).send();
     } catch (err: any) {
       return reply.status(404).send({
         error: { code: 'NOT_FOUND', message: err.message },

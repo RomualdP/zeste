@@ -167,4 +167,58 @@ describe('Project Routes', () => {
       await app.close();
     });
   });
+
+  describe('DELETE /api/projects/:id', () => {
+    it('should return 204 on successful deletion', async () => {
+      const app = await buildApp(mocks);
+      const response = await app.inject({
+        method: 'DELETE',
+        url: '/api/projects/p1',
+        headers: { authorization: 'Bearer valid-token' },
+      });
+
+      expect(response.statusCode).toBe(204);
+      expect(mocks.projectRepository.delete).toHaveBeenCalledWith('p1');
+      await app.close();
+    });
+
+    it('should return 404 when project not found', async () => {
+      vi.mocked(mocks.projectRepository.findById).mockResolvedValue(null);
+      const app = await buildApp(mocks);
+      const response = await app.inject({
+        method: 'DELETE',
+        url: '/api/projects/unknown',
+        headers: { authorization: 'Bearer valid-token' },
+      });
+
+      expect(response.statusCode).toBe(404);
+      await app.close();
+    });
+
+    it('should return 404 when user is not owner', async () => {
+      vi.mocked(mocks.projectRepository.findById).mockResolvedValue(
+        ProjectEntity.create('p1', 'other-user', 'Not mine'),
+      );
+      const app = await buildApp(mocks);
+      const response = await app.inject({
+        method: 'DELETE',
+        url: '/api/projects/p1',
+        headers: { authorization: 'Bearer valid-token' },
+      });
+
+      expect(response.statusCode).toBe(404);
+      await app.close();
+    });
+
+    it('should return 401 without auth token', async () => {
+      const app = await buildApp(mocks);
+      const response = await app.inject({
+        method: 'DELETE',
+        url: '/api/projects/p1',
+      });
+
+      expect(response.statusCode).toBe(401);
+      await app.close();
+    });
+  });
 });

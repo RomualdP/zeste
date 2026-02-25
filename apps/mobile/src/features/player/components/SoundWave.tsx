@@ -41,7 +41,7 @@ function buildWavePath(
 export function SoundWave({ width, height, isPlaying }: SoundWaveProps) {
   const phaseRef = useRef(0);
   const amplitudeRef = useRef(0.05);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | undefined>(undefined);
   const [, setTick] = useState(0);
 
   useEffect(() => {

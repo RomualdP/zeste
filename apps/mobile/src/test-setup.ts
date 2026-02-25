@@ -2,19 +2,22 @@ jest.mock('expo-clipboard', () => ({
   setStringAsync: jest.fn(),
 }));
 
-jest.mock('expo-av', () => ({
-  Audio: {
-    setAudioModeAsync: jest.fn(),
-    Sound: {
-      createAsync: jest.fn().mockResolvedValue({
-        sound: {
-          unloadAsync: jest.fn(),
-          pauseAsync: jest.fn(),
-          playAsync: jest.fn(),
-        },
-      }),
-    },
-  },
+jest.mock('expo-audio', () => ({
+  useAudioPlayer: jest.fn(() => ({
+    play: jest.fn(),
+    pause: jest.fn(),
+    replace: jest.fn(),
+    remove: jest.fn(),
+  })),
+  useAudioPlayerStatus: jest.fn(() => ({
+    playing: false,
+    isLoaded: false,
+    isBuffering: false,
+    currentTime: 0,
+    duration: 0,
+    didJustFinish: false,
+  })),
+  setAudioModeAsync: jest.fn(),
 }));
 
 jest.mock('./shared/services/supabase', () => ({

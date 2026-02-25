@@ -12,6 +12,9 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
 };
 
 export class MistralLlmService implements LlmServicePort {
+  private static readonly MAX_CONTINUATIONS = 3;
+  private static readonly WORD_COUNT_THRESHOLD = 0.8;
+
   constructor(private readonly apiKey: string) {}
 
   async generateChapterPlan(input: {
@@ -38,17 +41,32 @@ Le plan doit contenir exactement ${input.chapterCount} chapitres.`;
     targetWordCount: number;
     previousChaptersContext: string[];
   }): Promise<ScriptEntry[]> {
+    const script = await this.generateInitialScript(input);
+    return this.ensureTargetWordCount(script, input);
+  }
+
+  private async generateInitialScript(input: {
+    chapterTitle: string;
+    chapterSummary: string;
+    sources: string[];
+    tone: Tone;
+    targetWordCount: number;
+    previousChaptersContext: string[];
+  }): Promise<ScriptEntry[]> {
     const minEntries = Math.max(8, Math.round(input.targetWordCount / 50));
+    const wordsPerEntry = Math.round(input.targetWordCount / minEntries);
     const systemPrompt = `Tu es un scénariste de podcast en français avec deux intervenants : "host" (l'hôte) et "expert" (l'invité expert).
 ${TONE_INSTRUCTIONS[input.tone] ?? ''}
 Génère un script de dialogue naturel et COMPLET pour un chapitre de podcast.
 
-CONTRAINTES IMPORTANTES :
-- Le script DOIT faire au minimum ${input.targetWordCount} mots au total. C'est une contrainte stricte.
+CONTRAINTES STRICTES DE LONGUEUR :
+- Le script DOIT faire au minimum ${input.targetWordCount} mots au total.
 - Le script DOIT contenir au minimum ${minEntries} prises de parole alternées.
-- Chaque prise de parole fait 3-6 phrases détaillées (pas de réponses courtes).
-- Développe les idées en profondeur : exemples concrets, anecdotes, explications détaillées.
-- Ne résume pas, ne condense pas. Le but est de produire un contenu riche et long.
+- Chaque prise de parole DOIT faire entre ${wordsPerEntry} et ${wordsPerEntry * 2} mots (soit 3-6 phrases complètes). Pas de réponses courtes.
+- Développe chaque idée en profondeur : exemples concrets, anecdotes, chiffres, comparaisons, explications détaillées.
+- Ne résume JAMAIS, ne condense JAMAIS. Le but est un contenu riche, détaillé et long.
+
+RAPPEL : ${input.targetWordCount} mots MINIMUM au total. Si tu produis moins, le script sera rejeté.
 
 Réponds UNIQUEMENT avec un tableau JSON valide de la forme : [{"speaker": "host"|"expert", "text": "...", "tone": "..."}]`;
 
@@ -60,6 +78,70 @@ Réponds UNIQUEMENT avec un tableau JSON valide de la forme : [{"speaker": "host
 
     const content = await this.callMistral(systemPrompt, userPrompt);
     return JSON.parse(content) as ScriptEntry[];
+  }
+
+  private async ensureTargetWordCount(
+    script: ScriptEntry[],
+    input: {
+      chapterTitle: string;
+      chapterSummary: string;
+      sources: string[];
+      tone: Tone;
+      targetWordCount: number;
+      previousChaptersContext: string[];
+    },
+    attempt = 0,
+  ): Promise<ScriptEntry[]> {
+    const currentWords = this.countWords(script);
+    const threshold = input.targetWordCount * MistralLlmService.WORD_COUNT_THRESHOLD;
+
+    if (currentWords >= threshold || attempt >= MistralLlmService.MAX_CONTINUATIONS) {
+      return script;
+    }
+
+    console.log(`[LLM] Continuation ${attempt + 1}: ${currentWords} words, target ${input.targetWordCount}`);
+
+    const remainingWords = input.targetWordCount - currentWords;
+    const continuation = await this.generateContinuation(script, input, remainingWords);
+    const merged = [...script, ...continuation];
+
+    return this.ensureTargetWordCount(merged, input, attempt + 1);
+  }
+
+  private async generateContinuation(
+    existingScript: ScriptEntry[],
+    input: {
+      chapterTitle: string;
+      chapterSummary: string;
+      sources: string[];
+      tone: Tone;
+      targetWordCount: number;
+    },
+    remainingWords: number,
+  ): Promise<ScriptEntry[]> {
+    const minEntries = Math.max(4, Math.round(remainingWords / 50));
+    const systemPrompt = `Tu es un scénariste de podcast en français avec deux intervenants : "host" et "expert".
+${TONE_INSTRUCTIONS[input.tone] ?? ''}
+Tu dois CONTINUER un script de podcast existant. Le script actuel est trop court.
+
+CONTRAINTES :
+- Génère au minimum ${remainingWords} mots supplémentaires.
+- Génère au minimum ${minEntries} nouvelles prises de parole alternées.
+- Continue naturellement là où le dialogue s'est arrêté.
+- Ne répète PAS ce qui a déjà été dit.
+- Explore de nouveaux angles, exemples, anecdotes sur le même sujet.
+
+Réponds UNIQUEMENT avec un tableau JSON valide de la forme : [{"speaker": "host"|"expert", "text": "...", "tone": "..."}]`;
+
+    const scriptSummary = existingScript.map((e) => `[${e.speaker}]: ${e.text}`).join('\n');
+    const userPrompt = `Chapitre : ${input.chapterTitle}\n\nScript existant (${this.countWords(existingScript)} mots, objectif : ${input.targetWordCount} mots) :\n${scriptSummary}\n\nSources :\n${input.sources.join('\n\n---\n\n')}\n\nContinue le dialogue avec au moins ${remainingWords} mots supplémentaires.`;
+
+    const content = await this.callMistral(systemPrompt, userPrompt);
+    return JSON.parse(content) as ScriptEntry[];
+  }
+
+  private countWords(script: ScriptEntry[]): number {
+    return script.reduce((sum, entry) => sum + entry.text.split(/\s+/).filter(Boolean).length, 0);
   }
 
   private async callMistral(systemPrompt: string, userPrompt: string, maxTokens = 16000): Promise<string> {

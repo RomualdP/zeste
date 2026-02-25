@@ -69,6 +69,11 @@ export class GenerateScenario {
       updatedChapters.push(updated);
     }
 
+    const totalActualWords = updatedChapters.reduce((sum, ch) =>
+      sum + ch.script.reduce((s, e) => s + e.text.split(/\s+/).length, 0), 0);
+    const estimatedMinutes = Math.round(totalActualWords / 120);
+    console.log(`[SCENARIO] Done: ${totalActualWords} words total (target: ${totalWords}), estimated ~${estimatedMinutes} min`);
+
     return updatedChapters;
   }
 }

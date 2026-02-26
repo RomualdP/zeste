@@ -48,12 +48,12 @@ describe('GenerateChapterAudio', () => {
     expect(result.status).toBe('ready');
   });
 
-  it('should pass script segments to TTS service', async () => {
+  it('should pass script segments with emotion to TTS service', async () => {
     await useCase.execute({ chapterId: 'ch1' });
 
     expect(ttsService.synthesizeChapter).toHaveBeenCalledWith([
-      { speaker: 'host', text: 'Welcome to the show' },
-      { speaker: 'expert', text: 'Thanks for having me' },
+      { speaker: 'host', text: 'Welcome to the show', emotion: 'enthusiastic' },
+      { speaker: 'expert', text: 'Thanks for having me', emotion: 'friendly' },
     ]);
   });
 

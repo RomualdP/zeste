@@ -27,7 +27,7 @@ export class FishAudioTtsService implements TtsServicePort {
 
     for (const segment of segments) {
       const voiceId = this.voiceIds[segment.speaker] ?? '';
-      const chunk = await this.synthesizeSegment(segment.text, voiceId);
+      const chunk = await this.synthesizeSegment(segment.text, voiceId, segment.emotion);
       audioChunks.push(chunk);
 
       // Estimate duration from word count (150 words/min)
@@ -40,18 +40,22 @@ export class FishAudioTtsService implements TtsServicePort {
     return { audioBuffer, durationMs: Math.round(totalDurationMs) };
   }
 
-  private async synthesizeSegment(text: string, voiceId: string): Promise<Buffer> {
+  private async synthesizeSegment(text: string, voiceId: string, emotion?: string): Promise<Buffer> {
+    const ttsText = emotion ? `(${emotion}) ${text}` : text;
+
     const response = await fetch(FISH_AUDIO_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
+        'model': 's1',
       },
       body: JSON.stringify({
-        text,
+        text: ttsText,
         reference_id: voiceId,
         format: 'mp3',
         mp3_bitrate: AUDIO.MP3_BITRATE,
+        temperature: 0.8,
       }),
     });
 

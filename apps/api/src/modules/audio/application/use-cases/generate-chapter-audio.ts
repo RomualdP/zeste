@@ -30,6 +30,7 @@ export class GenerateChapterAudio {
       const segments = chapter.script.map((entry) => ({
         speaker: entry.speaker,
         text: entry.text,
+        emotion: entry.tone,
       }));
 
       const ttsResult = await this.ttsService.synthesizeChapter(segments);

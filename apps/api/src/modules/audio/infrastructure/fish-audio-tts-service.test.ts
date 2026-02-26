@@ -56,6 +56,51 @@ describe('FishAudioTtsService', () => {
       expect(call2Body.reference_id).toBe('expert-voice-id');
     });
 
+    it('should prepend emotion tag when provided', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(Buffer.from('audio').buffer),
+      });
+
+      await service.synthesizeChapter([
+        { speaker: 'host', text: 'Bienvenue dans ce podcast', emotion: 'excited' },
+      ]);
+
+      const body = JSON.parse(mockFetch.mock.calls[0]![1]!.body);
+      expect(body.text).toBe('(excited) Bienvenue dans ce podcast');
+    });
+
+    it('should not prepend emotion tag when not provided', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(Buffer.from('audio').buffer),
+      });
+
+      await service.synthesizeChapter([
+        { speaker: 'host', text: 'Bienvenue' },
+      ]);
+
+      const body = JSON.parse(mockFetch.mock.calls[0]![1]!.body);
+      expect(body.text).toBe('Bienvenue');
+    });
+
+    it('should send temperature and model header for expressiveness', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        arrayBuffer: () => Promise.resolve(Buffer.from('audio').buffer),
+      });
+
+      await service.synthesizeChapter([
+        { speaker: 'host', text: 'Test' },
+      ]);
+
+      const body = JSON.parse(mockFetch.mock.calls[0]![1]!.body);
+      const headers = mockFetch.mock.calls[0]![1]!.headers;
+
+      expect(body.temperature).toBe(0.8);
+      expect(headers.model).toBe('s1');
+    });
+
     it('should throw on Fish Audio API error', async () => {
       mockFetch.mockResolvedValue({
         ok: false,

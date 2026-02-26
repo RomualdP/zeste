@@ -128,6 +128,35 @@ describe('MistralLlmService', () => {
       ).rejects.toThrow('Mistral API error');
     });
 
+    it('should include emotion instructions in script prompt', async () => {
+      const script = [
+        { speaker: 'host', text: 'Bonjour', tone: 'excited' },
+      ];
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({
+          choices: [{ message: { content: JSON.stringify(script) } }],
+        }),
+      });
+
+      await service.generateChapterScript({
+        chapterTitle: 'Test',
+        chapterSummary: 'Test summary',
+        sources: ['content'],
+        tone: Tone.Pedagogue,
+        targetWordCount: 0,
+        previousChaptersContext: [],
+      });
+
+      const body = JSON.parse(mockFetch.mock.calls[0]![1]!.body);
+      const systemPrompt = body.messages[0].content;
+      expect(systemPrompt).toContain('TAGS D\'ÉMOTION');
+      expect(systemPrompt).toContain('excited');
+      expect(systemPrompt).toContain('confident');
+      expect(systemPrompt).toContain('curious');
+    });
+
     it('should include previous chapters context', async () => {
       mockFetch.mockResolvedValue({
         ok: true,

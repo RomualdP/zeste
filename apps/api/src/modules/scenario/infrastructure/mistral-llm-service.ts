@@ -11,6 +11,15 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
   interview: 'Adopte un ton d\'interview : l\'hôte pose des questions pertinentes et l\'expert y répond avec expertise.',
 };
 
+const EMOTION_INSTRUCTIONS = `
+TAGS D'ÉMOTION (champ "tone") :
+Le champ "tone" sera utilisé pour piloter la synthèse vocale. Utilise UNIQUEMENT ces tags :
+- Pour l'hôte : "excited", "curious", "surprised", "amused", "happy", "serious", "interested"
+- Pour l'expert : "confident", "serious", "sincere", "relaxed", "empathetic", "calm", "satisfied"
+- Effets sonores (utilisables par les deux) : "laughing", "sighing"
+- Varie les émotions d'une prise de parole à l'autre pour un rendu dynamique et naturel.
+- Ne mets JAMAIS deux fois le même tag d'affilée pour le même speaker.`;
+
 export class MistralLlmService implements LlmServicePort {
   private static readonly MAX_CONTINUATIONS = 3;
   private static readonly WORD_COUNT_THRESHOLD = 0.8;
@@ -65,6 +74,7 @@ CONTRAINTES STRICTES DE LONGUEUR :
 - Chaque prise de parole DOIT faire entre ${wordsPerEntry} et ${wordsPerEntry * 2} mots (soit 3-6 phrases complètes). Pas de réponses courtes.
 - Développe chaque idée en profondeur : exemples concrets, anecdotes, chiffres, comparaisons, explications détaillées.
 - Ne résume JAMAIS, ne condense JAMAIS. Le but est un contenu riche, détaillé et long.
+${EMOTION_INSTRUCTIONS}
 
 RAPPEL : ${input.targetWordCount} mots MINIMUM au total. Si tu produis moins, le script sera rejeté.
 
@@ -130,6 +140,7 @@ CONTRAINTES :
 - Continue naturellement là où le dialogue s'est arrêté.
 - Ne répète PAS ce qui a déjà été dit.
 - Explore de nouveaux angles, exemples, anecdotes sur le même sujet.
+${EMOTION_INSTRUCTIONS}
 
 Réponds UNIQUEMENT avec un tableau JSON valide de la forme : [{"speaker": "host"|"expert", "text": "...", "tone": "..."}]`;
 

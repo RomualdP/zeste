@@ -1,5 +1,6 @@
 import React, { useRef, useCallback } from 'react';
 import { View, StyleSheet, PanResponder } from 'react-native';
+import { color } from '../theme';
 
 interface SliderProps {
   value: number;
@@ -18,9 +19,9 @@ export function Slider({
   min,
   max,
   step = 1,
-  trackColor = '#ddd',
-  activeTrackColor = '#FF6B35',
-  thumbColor = '#FF6B35',
+  trackColor = color.line,
+  activeTrackColor = color.ink,
+  thumbColor = color.ink,
   onValueChange,
   testID,
 }: SliderProps) {
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginLeft: -12,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: color.ink,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,

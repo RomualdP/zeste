@@ -18,8 +18,10 @@
     "@supabase/supabase-js": "^2.97.0",
     "@zeste/domain": "workspace:*",
     "@zeste/shared": "workspace:*",
+    "bullmq": "^5.76.5",
     "fastify": "^5.7.4",
-    "fastify-plugin": "^5.1.0"
+    "fastify-plugin": "^5.1.0",
+    "ioredis": "^5.10.1"
   },
   "devDependencies": {
     "@types/node": "^25.3.0",

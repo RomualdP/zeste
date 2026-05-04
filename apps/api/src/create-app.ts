@@ -11,6 +11,8 @@ import { chapterRoutes } from './modules/scenario/interfaces/chapters';
 import { audioRoutes } from './modules/audio/interfaces/audio';
 import { sharingRoutes } from './modules/sharing/interfaces/sharing';
 import { webhookRoutes } from './modules/identity/interfaces/webhooks';
+import { generationRoutes, type GenerateFullQueuePort } from './modules/generation/interfaces/generation';
+import type { GenerationStatusRepositoryPort } from './modules/project/application/ports/generation-status-repository.port';
 import type { AuthServicePort } from './modules/identity/application/ports/auth-service.port';
 import type { UserRepositoryPort } from './modules/identity/application/ports/user-repository.port';
 import type { ProjectRepositoryPort } from './modules/project/application/ports/project-repository.port';
@@ -33,6 +35,8 @@ interface AppDependencies {
   ttsService?: TtsServicePort;
   audioStorage?: AudioStoragePort;
   sharedLinkRepository?: SharedLinkRepositoryPort;
+  generationStatusRepository?: GenerationStatusRepositoryPort;
+  generationQueue?: GenerateFullQueuePort;
 }
 
 export function createApp(deps: AppDependencies = {}) {
@@ -51,6 +55,8 @@ export function createApp(deps: AppDependencies = {}) {
   if (deps.ttsService) app.decorate('ttsService', deps.ttsService);
   if (deps.audioStorage) app.decorate('audioStorage', deps.audioStorage);
   if (deps.sharedLinkRepository) app.decorate('sharedLinkRepository', deps.sharedLinkRepository);
+  if (deps.generationStatusRepository) app.decorate('generationStatusRepository', deps.generationStatusRepository);
+  if (deps.generationQueue) app.decorate('generationQueue', deps.generationQueue);
 
   app.register(cors);
   app.register(errorHandler);
@@ -62,6 +68,7 @@ export function createApp(deps: AppDependencies = {}) {
   app.register(scenarioRoutes, { prefix: '/api/projects/:id' });
   app.register(chapterRoutes, { prefix: '/api/projects/:id' });
   app.register(audioRoutes, { prefix: '/api/projects/:id' });
+  app.register(generationRoutes, { prefix: '/api/projects/:id' });
   app.register(sharingRoutes);
   app.register(webhookRoutes, { prefix: '/api/webhooks' });
 

@@ -6,6 +6,7 @@ export {
   Tone,
   TargetDuration,
   ChapterStatus,
+  GenerationPhase,
 } from './enums';
 
 // Types

@@ -1,28 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../features/auth/hooks/useAuth';
-import { LoginScreen } from '../features/auth/screens/LoginScreen';
-import { SignupScreen } from '../features/auth/screens/SignupScreen';
-import { ProjectListScreen } from '../features/project/screens/ProjectListScreen';
-import { CreateProjectScreen } from '../features/project/screens/CreateProjectScreen';
-import { ProjectDetailScreen } from '../features/project/screens/ProjectDetailScreen';
-import { AddSourceScreen } from '../features/project/screens/AddSourceScreen';
-import { ConfigureScreen } from '../features/configuration/screens/ConfigureScreen';
+import { OnboardingScreen } from '../features/auth/screens/OnboardingScreen';
+import { AuthScreen } from '../features/auth/screens/AuthScreen';
+import { LibraryScreen } from '../features/project/screens/LibraryScreen';
+import { DetailScreen } from '../features/project/screens/DetailScreen';
+import { ComposeScreen } from '../features/compose/screens/ComposeScreen';
+import { GeneratingScreen } from '../features/compose/screens/GeneratingScreen';
 import { ChapterListScreen } from '../features/scenario/screens/ChapterListScreen';
 import { PlayerScreen } from '../features/player/screens/PlayerScreen';
-import { ShareScreen } from '../features/sharing/screens/ShareScreen';
 import type { AuthStackParamList, MainStackParamList } from './types';
-import { ActivityIndicator, View } from 'react-native';
+import { color } from '../shared/theme';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
-function AuthNavigator() {
+const HAS_SEEN_ONBOARDING_KEY = 'hasSeenOnboarding';
+
+function AuthNavigator({ initialRouteName }: { initialRouteName: keyof AuthStackParamList }) {
   return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Signup" component={SignupScreen} />
+    <AuthStack.Navigator
+      initialRouteName={initialRouteName}
+      screenOptions={{ headerShown: false }}
+    >
+      <AuthStack.Screen name="Onboarding" component={OnboardingScreen} />
+      <AuthStack.Screen name="Auth" component={AuthScreen} />
     </AuthStack.Navigator>
   );
 }
@@ -31,29 +36,24 @@ function MainNavigator() {
   return (
     <MainStack.Navigator>
       <MainStack.Screen
-        name="ProjectList"
-        component={ProjectListScreen}
-        options={{ title: 'Mes projets' }}
+        name="Library"
+        component={LibraryScreen}
+        options={{ headerShown: false }}
       />
       <MainStack.Screen
-        name="CreateProject"
-        component={CreateProjectScreen}
-        options={{ title: 'Nouveau projet' }}
+        name="Compose"
+        component={ComposeScreen}
+        options={{ headerShown: false }}
       />
       <MainStack.Screen
-        name="ProjectDetail"
-        component={ProjectDetailScreen}
-        options={{ title: 'Projet' }}
+        name="Generating"
+        component={GeneratingScreen}
+        options={{ headerShown: false }}
       />
       <MainStack.Screen
-        name="AddSource"
-        component={AddSourceScreen}
-        options={{ title: 'Ajouter une source' }}
-      />
-      <MainStack.Screen
-        name="Configure"
-        component={ConfigureScreen}
-        options={{ title: 'Configuration' }}
+        name="Detail"
+        component={DetailScreen}
+        options={{ title: 'Épisode' }}
       />
       <MainStack.Screen
         name="ChapterList"
@@ -65,29 +65,35 @@ function MainNavigator() {
         component={PlayerScreen}
         options={{ title: 'Lecteur' }}
       />
-      <MainStack.Screen
-        name="Share"
-        component={ShareScreen}
-        options={{ title: 'Partager' }}
-      />
     </MainStack.Navigator>
   );
 }
 
 export function RootNavigator() {
   const { isAuthenticated, loading } = useAuth();
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
 
-  if (loading) {
+  useEffect(() => {
+    AsyncStorage.getItem(HAS_SEEN_ONBOARDING_KEY)
+      .then((value) => setHasSeenOnboarding(value === 'true'))
+      .catch(() => setHasSeenOnboarding(false));
+  }, []);
+
+  if (loading || hasSeenOnboarding === null) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color={color.ink} />
       </View>
     );
   }
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
+      {isAuthenticated ? (
+        <MainNavigator />
+      ) : (
+        <AuthNavigator initialRouteName={hasSeenOnboarding ? 'Auth' : 'Onboarding'} />
+      )}
     </NavigationContainer>
   );
 }

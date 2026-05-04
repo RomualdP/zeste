@@ -51,9 +51,17 @@ export function useGenerationStatus(projectId: string): UseGenerationStatus {
   useInterval(fetchStatus, delay);
 
   const retry = useCallback(async () => {
-    await apiPost(`/api/projects/${projectId}/generate-full`);
-    setStatus({ phase: GenerationPhase.Plan, progress: 0, error: null });
-    await fetchStatus();
+    try {
+      await apiPost(`/api/projects/${projectId}/generate-full`);
+      setStatus({ phase: GenerationPhase.Plan, progress: 0, error: null });
+      await fetchStatus();
+    } catch (err) {
+      setStatus({
+        phase: GenerationPhase.Error,
+        progress: 0,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
   }, [projectId, fetchStatus]);
 
   return { status, retry };

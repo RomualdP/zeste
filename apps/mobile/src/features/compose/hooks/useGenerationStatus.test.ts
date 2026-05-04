@@ -73,6 +73,21 @@ describe('useGenerationStatus', () => {
     expect(result.current.status.error).toBe('Mistral down');
   });
 
+  it('retry() surfaces the apiPost error when /generate-full rejects', async () => {
+    mockedGet.mockResolvedValueOnce({ phase: 'error', progress: 0, error: 'first failure' });
+    mockedPost.mockRejectedValueOnce(new Error('Quota exceeded'));
+
+    const { result } = renderHook(() => useGenerationStatus('p-1'));
+    await waitFor(() => expect(result.current.status.phase).toBe('error'));
+
+    await act(async () => {
+      await result.current.retry();
+    });
+
+    expect(result.current.status.phase).toBe('error');
+    expect(result.current.status.error).toBe('Quota exceeded');
+  });
+
   it('retry() re-POSTs /generate-full and resumes polling', async () => {
     mockedGet
       .mockResolvedValueOnce({ phase: 'error', progress: 0, error: 'boom' })

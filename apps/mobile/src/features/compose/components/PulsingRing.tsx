@@ -30,7 +30,7 @@ export function PulsingRing({ delayMs, toneInk, size = 200, testID }: PulsingRin
   }, [delayMs, progress]);
 
   const scale = progress.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1.4] });
-  const opacity = progress.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0] });
+  const opacity = progress.interpolate({ inputRange: [0, 1], outputRange: [0.2, 0] });
 
   return (
     <Animated.View

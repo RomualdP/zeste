@@ -106,9 +106,7 @@ function ErrorBlock({
   onRetry: () => Promise<void>;
 }) {
   const handleRetry = () => {
-    onRetry().catch(() => {
-      // useGenerationStatus.retry already routes apiPost rejections through fetchStatus catch.
-    });
+    void onRetry();
   };
 
   return (

@@ -76,7 +76,7 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
           onPress: async () => {
             try {
               await apiDelete(`/api/projects/${projectId}`);
-              navigation.navigate('ProjectList');
+              navigation.navigate('Library');
             } catch (err: any) {
               Alert.alert('Erreur', err.message);
             }

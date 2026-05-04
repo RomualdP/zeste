@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { LoginScreen } from '../features/auth/screens/LoginScreen';
 import { SignupScreen } from '../features/auth/screens/SignupScreen';
-import { ProjectListScreen } from '../features/project/screens/ProjectListScreen';
+import { LibraryScreen } from '../features/project/screens/LibraryScreen';
 import { ProjectDetailScreen } from '../features/project/screens/ProjectDetailScreen';
 import { ComposeScreen } from '../features/compose/screens/ComposeScreen';
 import { GeneratingScreen } from '../features/compose/screens/GeneratingScreen';
@@ -31,9 +31,9 @@ function MainNavigator() {
   return (
     <MainStack.Navigator>
       <MainStack.Screen
-        name="ProjectList"
-        component={ProjectListScreen}
-        options={{ title: 'Mes projets' }}
+        name="Library"
+        component={LibraryScreen}
+        options={{ headerShown: false }}
       />
       <MainStack.Screen
         name="Compose"

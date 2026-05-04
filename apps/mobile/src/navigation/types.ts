@@ -4,7 +4,7 @@ export type AuthStackParamList = {
 };
 
 export type MainStackParamList = {
-  ProjectList: undefined;
+  Library: undefined;
   ProjectDetail: { projectId: string };
   Compose: { projectId?: string } | undefined;
   Generating: { projectId: string };

@@ -251,7 +251,7 @@ describe('ProjectDetailScreen', () => {
 
     await waitFor(() => {
       expect(api.apiDelete).toHaveBeenCalledWith('/api/projects/p1');
-      expect(mockNavigation.navigate).toHaveBeenCalledWith('ProjectList');
+      expect(mockNavigation.navigate).toHaveBeenCalledWith('Library');
     });
   });
 });

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../features/auth/hooks/useAuth';
-import { LoginScreen } from '../features/auth/screens/LoginScreen';
-import { SignupScreen } from '../features/auth/screens/SignupScreen';
+import { OnboardingScreen } from '../features/auth/screens/OnboardingScreen';
+import { AuthScreen } from '../features/auth/screens/AuthScreen';
 import { LibraryScreen } from '../features/project/screens/LibraryScreen';
 import { DetailScreen } from '../features/project/screens/DetailScreen';
 import { ComposeScreen } from '../features/compose/screens/ComposeScreen';
@@ -12,16 +14,20 @@ import { ChapterListScreen } from '../features/scenario/screens/ChapterListScree
 import { PlayerScreen } from '../features/player/screens/PlayerScreen';
 import type { AuthStackParamList, MainStackParamList } from './types';
 import { color } from '../shared/theme';
-import { ActivityIndicator, View } from 'react-native';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
-function AuthNavigator() {
+const HAS_SEEN_ONBOARDING_KEY = 'hasSeenOnboarding';
+
+function AuthNavigator({ initialRouteName }: { initialRouteName: keyof AuthStackParamList }) {
   return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Signup" component={SignupScreen} />
+    <AuthStack.Navigator
+      initialRouteName={initialRouteName}
+      screenOptions={{ headerShown: false }}
+    >
+      <AuthStack.Screen name="Onboarding" component={OnboardingScreen} />
+      <AuthStack.Screen name="Auth" component={AuthScreen} />
     </AuthStack.Navigator>
   );
 }
@@ -65,8 +71,15 @@ function MainNavigator() {
 
 export function RootNavigator() {
   const { isAuthenticated, loading } = useAuth();
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
 
-  if (loading) {
+  useEffect(() => {
+    AsyncStorage.getItem(HAS_SEEN_ONBOARDING_KEY)
+      .then((value) => setHasSeenOnboarding(value === 'true'))
+      .catch(() => setHasSeenOnboarding(false));
+  }, []);
+
+  if (loading || hasSeenOnboarding === null) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color={color.ink} />
@@ -76,7 +89,11 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
+      {isAuthenticated ? (
+        <MainNavigator />
+      ) : (
+        <AuthNavigator initialRouteName={hasSeenOnboarding ? 'Auth' : 'Onboarding'} />
+      )}
     </NavigationContainer>
   );
 }

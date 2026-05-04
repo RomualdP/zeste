@@ -13,6 +13,7 @@ import { ChapterListScreen } from '../features/scenario/screens/ChapterListScree
 import { PlayerScreen } from '../features/player/screens/PlayerScreen';
 import { ShareScreen } from '../features/sharing/screens/ShareScreen';
 import type { AuthStackParamList, MainStackParamList } from './types';
+import { color } from '../shared/theme';
 import { ActivityIndicator, View } from 'react-native';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
@@ -80,7 +81,7 @@ export function RootNavigator() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#FF6B35" />
+        <ActivityIndicator size="large" color={color.ink} />
       </View>
     );
   }

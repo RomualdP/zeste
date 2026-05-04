@@ -1,2 +1,9 @@
-export { Slider } from './Slider';
+export { Bubble } from './Bubble';
+export { Button } from './Button';
 export { Checkbox } from './Checkbox';
+export { Chip } from './Chip';
+export { Header } from './Header';
+export { InputBar } from './InputBar';
+export { ListRow } from './ListRow';
+export { Slider } from './Slider';
+export { ToneCard } from './ToneCard';

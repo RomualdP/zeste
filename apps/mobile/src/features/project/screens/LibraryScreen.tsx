@@ -64,7 +64,10 @@ export function LibraryScreen({ navigation }: LibraryScreenProps) {
     if (project.status === 'ready') {
       navigation.navigate('Player', { projectId: project.id });
     } else if (project.status === 'processing') {
-      navigation.navigate('Generating', { projectId: project.id });
+      navigation.navigate('Generating', {
+        projectId: project.id,
+        tone: safeTone(project.tone),
+      });
     } else {
       navigation.navigate('Compose', { projectId: project.id });
     }

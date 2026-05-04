@@ -90,7 +90,7 @@ describe('LibraryScreen', () => {
 
     fireEvent.press(await findByText('Brewing soon'));
 
-    expect(navigation.navigate).toHaveBeenCalledWith('Generating', { projectId: 'p1' });
+    expect(navigation.navigate).toHaveBeenCalledWith('Generating', { projectId: 'p1', tone: 'interview' });
   });
 
   it('routes to Compose with projectId for a draft project', async () => {

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GenerationPhase } from '@zeste/shared';
-import { Bubble, Button } from '../../../shared/components';
-import { space, tone, type, ToneId } from '../../../shared/theme';
+import { Button } from '../../../shared/components';
+import { color, space, tone, type, ToneId } from '../../../shared/theme';
 import { useGenerationStatus } from '../hooks/useGenerationStatus';
 import { PulsingRing } from '../components/PulsingRing';
 
@@ -107,13 +107,15 @@ function ErrorBlock({
 }) {
   const handleRetry = () => {
     onRetry().catch(() => {
-      // useGenerationStatus.retry already updates state on apiPost rejection via fetchStatus catch.
+      // useGenerationStatus.retry already routes apiPost rejections through fetchStatus catch.
     });
   };
 
   return (
     <View style={styles.errorBlock}>
-      <Bubble from="app">{message ?? 'Une erreur est survenue.'}</Bubble>
+      <View style={styles.errorBox}>
+        <Text style={styles.errorText}>{message ?? 'Une erreur est survenue.'}</Text>
+      </View>
       <Button label="Réessayer" onPress={handleRetry} testID="generating-retry" />
     </View>
   );
@@ -151,6 +153,20 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: space.md,
     alignItems: 'center',
+  },
+  errorBox: {
+    paddingVertical: space.md,
+    paddingHorizontal: space.lg,
+    borderWidth: 1,
+    borderColor: color.danger,
+    borderRadius: 18,
+    backgroundColor: color.surface,
+    maxWidth: '100%',
+  },
+  errorText: {
+    color: color.danger,
+    fontSize: type.body.fontSize,
+    textAlign: 'center',
   },
   footer: {
     paddingTop: space.lg,

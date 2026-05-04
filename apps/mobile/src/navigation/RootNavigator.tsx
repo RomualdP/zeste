@@ -5,12 +5,11 @@ import { useAuth } from '../features/auth/hooks/useAuth';
 import { LoginScreen } from '../features/auth/screens/LoginScreen';
 import { SignupScreen } from '../features/auth/screens/SignupScreen';
 import { LibraryScreen } from '../features/project/screens/LibraryScreen';
-import { ProjectDetailScreen } from '../features/project/screens/ProjectDetailScreen';
+import { DetailScreen } from '../features/project/screens/DetailScreen';
 import { ComposeScreen } from '../features/compose/screens/ComposeScreen';
 import { GeneratingScreen } from '../features/compose/screens/GeneratingScreen';
 import { ChapterListScreen } from '../features/scenario/screens/ChapterListScreen';
 import { PlayerScreen } from '../features/player/screens/PlayerScreen';
-import { ShareScreen } from '../features/sharing/screens/ShareScreen';
 import type { AuthStackParamList, MainStackParamList } from './types';
 import { color } from '../shared/theme';
 import { ActivityIndicator, View } from 'react-native';
@@ -46,9 +45,9 @@ function MainNavigator() {
         options={{ headerShown: false }}
       />
       <MainStack.Screen
-        name="ProjectDetail"
-        component={ProjectDetailScreen}
-        options={{ title: 'Projet' }}
+        name="Detail"
+        component={DetailScreen}
+        options={{ title: 'Épisode' }}
       />
       <MainStack.Screen
         name="ChapterList"
@@ -59,11 +58,6 @@ function MainNavigator() {
         name="Player"
         component={PlayerScreen}
         options={{ title: 'Lecteur' }}
-      />
-      <MainStack.Screen
-        name="Share"
-        component={ShareScreen}
-        options={{ title: 'Partager' }}
       />
     </MainStack.Navigator>
   );

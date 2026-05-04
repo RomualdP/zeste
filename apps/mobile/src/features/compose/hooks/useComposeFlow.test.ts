@@ -154,11 +154,12 @@ describe('useComposeFlow', () => {
     expect(result.current.chapters).toBe(4);
   });
 
-  it('submits PATCH /configure with chapterCount=1 when chapters is null', async () => {
+  it('submits PATCH /configure then POST /generate-full and returns {projectId, tone}', async () => {
     mockedPost
       .mockResolvedValueOnce({ id: 'p-1', name: 'X' })
       .mockResolvedValueOnce({ id: 's-1', type: 'url', value: 'https://x.fr' });
     mockedPatch.mockResolvedValueOnce({ id: 'p-1' });
+    mockedPost.mockResolvedValueOnce({ jobId: 'job-1' });
 
     const { result } = renderHook(() => useComposeFlow());
 
@@ -185,9 +186,40 @@ describe('useComposeFlow', () => {
       targetDuration: 12,
       chapterCount: 1,
     });
-    expect(outcome).toEqual({ projectId: 'p-1' });
+    expect(mockedPost).toHaveBeenLastCalledWith('/api/projects/p-1/generate-full');
+    expect(outcome).toEqual({ projectId: 'p-1', tone: 'pedagogue' });
 
     await waitFor(() => expect(result.current.phase).toBe('ready'));
+  });
+
+  it('returns null and surfaces the error when /generate-full fails', async () => {
+    mockedPost
+      .mockResolvedValueOnce({ id: 'p-1', name: 'X' })
+      .mockResolvedValueOnce({ id: 's-1', type: 'url', value: 'https://x.fr' });
+    mockedPatch.mockResolvedValueOnce({ id: 'p-1' });
+    mockedPost.mockRejectedValueOnce(new Error('Quota exceeded'));
+
+    const { result } = renderHook(() => useComposeFlow());
+
+    await act(async () => {
+      await result.current.submitName('X');
+    });
+    await act(async () => {
+      await result.current.addSource({ type: 'url', value: 'https://x.fr' });
+    });
+    act(() => {
+      result.current.advanceToTone();
+      result.current.selectTone('debate');
+    });
+
+    let outcome: Awaited<ReturnType<typeof result.current.submit>> = null;
+    await act(async () => {
+      outcome = await result.current.submit();
+    });
+
+    expect(outcome).toBeNull();
+    expect(result.current.error).toBe('Quota exceeded');
+    expect(result.current.phase).toBe('duration');
   });
 
   it('returns null and surfaces the error when submit fails', async () => {

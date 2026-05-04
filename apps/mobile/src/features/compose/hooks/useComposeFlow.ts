@@ -29,7 +29,7 @@ export interface UseComposeFlow {
   selectTone: (toneId: ToneId) => void;
   setDuration: (duration: number) => void;
   setChapters: (chapters: number | null) => void;
-  submit: () => Promise<{ projectId: string } | null>;
+  submit: () => Promise<{ projectId: string; tone: ToneId } | null>;
 }
 
 const DEFAULT_DURATION = 15;
@@ -129,7 +129,7 @@ export function useComposeFlow(): UseComposeFlow {
     setChaptersState(value);
   }, []);
 
-  const submit = useCallback(async (): Promise<{ projectId: string } | null> => {
+  const submit = useCallback(async (): Promise<{ projectId: string; tone: ToneId } | null> => {
     if (!projectId || !tone) return null;
 
     setLoading(true);
@@ -140,8 +140,9 @@ export function useComposeFlow(): UseComposeFlow {
         targetDuration: duration,
         chapterCount: chapters ?? 1,
       });
+      await apiPost(`/api/projects/${projectId}/generate-full`);
       setPhase('ready');
-      return { projectId };
+      return { projectId, tone };
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       return null;

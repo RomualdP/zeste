@@ -56,7 +56,10 @@ export function ComposeScreen({ navigation }: ComposeScreenProps) {
   const onLaunch = async () => {
     const result = await flow.submit();
     if (result) {
-      navigation.navigate('Generating', { projectId: result.projectId });
+      navigation.navigate('Generating', {
+        projectId: result.projectId,
+        tone: result.tone,
+      });
     }
   };
 

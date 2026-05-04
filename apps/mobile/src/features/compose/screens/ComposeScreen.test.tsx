@@ -85,6 +85,7 @@ describe('ComposeScreen', () => {
     const toneCard = await findByTestId('compose-tone-card-pedagogue');
     fireEvent.press(toneCard);
 
+    mockedPost.mockResolvedValueOnce({ jobId: 'job-1' });
     fireEvent.press(await findByTestId('compose-launch'));
 
     await waitFor(() => {
@@ -92,7 +93,10 @@ describe('ComposeScreen', () => {
         '/api/projects/p-1/configure',
         expect.objectContaining({ tone: 'pedagogue' }),
       );
-      expect(navigation.navigate).toHaveBeenCalledWith('Generating', { projectId: 'p-1' });
+      expect(navigation.navigate).toHaveBeenCalledWith('Generating', {
+        projectId: 'p-1',
+        tone: 'pedagogue',
+      });
     });
   });
 });

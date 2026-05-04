@@ -48,8 +48,8 @@ export function ChapterListScreen({ route, navigation }: Props) {
     try {
       const data = await apiPost<Chapter[]>(`/api/projects/${projectId}/generate-plan`);
       setChapters(data);
-    } catch (err: any) {
-      Alert.alert('Erreur', err.message);
+    } catch (err) {
+      Alert.alert('Erreur', err instanceof Error ? err.message : 'Erreur');
     } finally {
       setGenerating(false);
       setGeneratingLabel('');
@@ -63,8 +63,8 @@ export function ChapterListScreen({ route, navigation }: Props) {
       const data = await apiPost<Chapter[]>(`/api/projects/${projectId}/generate`);
       setChapters(data);
       Alert.alert('Succès', 'Scénario généré ! Vous pouvez maintenant générer l\'audio.');
-    } catch (err: any) {
-      Alert.alert('Erreur', err.message);
+    } catch (err) {
+      Alert.alert('Erreur', err instanceof Error ? err.message : 'Erreur');
     } finally {
       setGenerating(false);
       setGeneratingLabel('');
@@ -78,8 +78,8 @@ export function ChapterListScreen({ route, navigation }: Props) {
       await apiPost(`/api/projects/${projectId}/generate-audio`);
       await loadChapters();
       Alert.alert('Succès', 'Audio généré avec succès !');
-    } catch (err: any) {
-      Alert.alert('Erreur', err.message);
+    } catch (err) {
+      Alert.alert('Erreur', err instanceof Error ? err.message : 'Erreur');
     } finally {
       setGenerating(false);
       setGeneratingLabel('');

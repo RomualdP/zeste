@@ -20,8 +20,8 @@ export function SignupScreen({ navigation }: Props) {
       await signUp(email, password, displayName);
       Alert.alert('Succès', 'Compte créé ! Connectez-vous.');
       navigation.navigate('Login');
-    } catch (err: any) {
-      Alert.alert('Erreur', err.message);
+    } catch (err) {
+      Alert.alert('Erreur', err instanceof Error ? err.message : 'Inscription impossible');
     } finally {
       setLoading(false);
     }

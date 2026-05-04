@@ -2,17 +2,21 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { ChapterListScreen } from './ChapterListScreen';
 import * as api from '../../../shared/services/api';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { MainStackParamList } from '../../../navigation/types';
 
 jest.mock('../../../shared/services/api');
+
+type ChapterListProps = NativeStackScreenProps<MainStackParamList, 'ChapterList'>;
 
 const mockNavigation = {
   navigate: jest.fn(),
   addListener: jest.fn(() => jest.fn()),
-} as any;
+} as unknown as ChapterListProps['navigation'];
 
 const mockRoute = {
   params: { projectId: 'p1' },
-} as any;
+} as unknown as ChapterListProps['route'];
 
 describe('ChapterListScreen', () => {
   beforeEach(() => {

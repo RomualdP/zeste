@@ -3,18 +3,25 @@ import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { DetailScreen } from './DetailScreen';
 import * as api from '../../../shared/services/api';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { MainStackParamList } from '../../../navigation/types';
+import type { Project, SharedLink, Source } from '@zeste/shared';
 
 jest.mock('../../../shared/services/api');
+
+type DetailProps = NativeStackScreenProps<MainStackParamList, 'Detail'>;
 
 const mockNavigation = {
   navigate: jest.fn(),
   goBack: jest.fn(),
   addListener: jest.fn(() => jest.fn()),
-} as any;
+} as unknown as DetailProps['navigation'];
 
-const baseRoute = { params: { projectId: 'p1' } } as any;
+const baseRoute = {
+  params: { projectId: 'p1' },
+} as unknown as DetailProps['route'];
 
-const baseProject = {
+const baseProject: Project = {
   id: 'p1',
   userId: 'u1',
   name: 'L’IA en 2026',
@@ -26,14 +33,16 @@ const baseProject = {
   updatedAt: '2026-05-04T00:00:00.000Z',
 };
 
+const defaultShareLink: SharedLink = { slug: 'abc123', isActive: true };
+
 function mockApi({
   project = baseProject,
-  sources = [] as any[],
-  shareLink = { slug: 'abc123', isActive: true },
+  sources = [],
+  shareLink = defaultShareLink,
 }: {
-  project?: any;
-  sources?: any[];
-  shareLink?: any;
+  project?: Project;
+  sources?: Source[];
+  shareLink?: SharedLink;
 } = {}) {
   (api.apiGet as jest.Mock).mockImplementation((path: string) => {
     if (path === '/api/projects/p1') return Promise.resolve(project);
@@ -110,7 +119,7 @@ describe('DetailScreen', () => {
           url: 'https://lemonde.fr/ia',
           filePath: null,
           rawContent: '',
-          status: 'ready',
+          status: 'ingested',
           errorMessage: null,
           createdAt: '2026-05-04T00:00:00.000Z',
         },

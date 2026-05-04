@@ -17,8 +17,8 @@ export function LoginScreen({ navigation }: Props) {
     setLoading(true);
     try {
       await signIn(email, password);
-    } catch (err: any) {
-      Alert.alert('Erreur', err.message);
+    } catch (err) {
+      Alert.alert('Erreur', err instanceof Error ? err.message : 'Connexion impossible');
     } finally {
       setLoading(false);
     }

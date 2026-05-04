@@ -65,7 +65,7 @@ describe('ProjectListScreen', () => {
       fireEvent.press(getByTestId('create-project-button'));
     });
 
-    expect(mockNavigation.navigate).toHaveBeenCalledWith('CreateProject');
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('Compose');
   });
 
   it('should navigate to ProjectDetail on project press', async () => {

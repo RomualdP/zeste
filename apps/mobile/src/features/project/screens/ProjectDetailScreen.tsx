@@ -150,7 +150,7 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
 
       <TouchableOpacity
         style={styles.addSourceButton}
-        onPress={() => navigation.navigate('AddSource', { projectId })}
+        onPress={() => navigation.navigate('Compose', { projectId })}
         testID="add-source-button"
       >
         <Text style={styles.addSourceText}>+ Ajouter une source</Text>
@@ -158,7 +158,7 @@ export function ProjectDetailScreen({ route, navigation }: Props) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Configure', { projectId })}
+        onPress={() => navigation.navigate('Compose', { projectId })}
         testID="configure-button"
       >
         <Text style={styles.buttonText}>Configurer</Text>

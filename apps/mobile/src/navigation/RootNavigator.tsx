@@ -5,10 +5,9 @@ import { useAuth } from '../features/auth/hooks/useAuth';
 import { LoginScreen } from '../features/auth/screens/LoginScreen';
 import { SignupScreen } from '../features/auth/screens/SignupScreen';
 import { ProjectListScreen } from '../features/project/screens/ProjectListScreen';
-import { CreateProjectScreen } from '../features/project/screens/CreateProjectScreen';
 import { ProjectDetailScreen } from '../features/project/screens/ProjectDetailScreen';
-import { AddSourceScreen } from '../features/project/screens/AddSourceScreen';
-import { ConfigureScreen } from '../features/configuration/screens/ConfigureScreen';
+import { ComposeScreen } from '../features/compose/screens/ComposeScreen';
+import { GeneratingScreen } from '../features/compose/screens/GeneratingScreen';
 import { ChapterListScreen } from '../features/scenario/screens/ChapterListScreen';
 import { PlayerScreen } from '../features/player/screens/PlayerScreen';
 import { ShareScreen } from '../features/sharing/screens/ShareScreen';
@@ -37,24 +36,19 @@ function MainNavigator() {
         options={{ title: 'Mes projets' }}
       />
       <MainStack.Screen
-        name="CreateProject"
-        component={CreateProjectScreen}
-        options={{ title: 'Nouveau projet' }}
+        name="Compose"
+        component={ComposeScreen}
+        options={{ headerShown: false }}
+      />
+      <MainStack.Screen
+        name="Generating"
+        component={GeneratingScreen}
+        options={{ headerShown: false }}
       />
       <MainStack.Screen
         name="ProjectDetail"
         component={ProjectDetailScreen}
         options={{ title: 'Projet' }}
-      />
-      <MainStack.Screen
-        name="AddSource"
-        component={AddSourceScreen}
-        options={{ title: 'Ajouter une source' }}
-      />
-      <MainStack.Screen
-        name="Configure"
-        component={ConfigureScreen}
-        options={{ title: 'Configuration' }}
       />
       <MainStack.Screen
         name="ChapterList"

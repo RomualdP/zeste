@@ -6,15 +6,18 @@ interface ToneCardProps {
   toneId: ToneId;
   selected: boolean;
   onPress: () => void;
+  testID?: string;
 }
 
-export function ToneCard({ toneId, selected, onPress }: ToneCardProps) {
+export function ToneCard({ toneId, selected, onPress, testID }: ToneCardProps) {
   const palette = tone[toneId];
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
       activeOpacity={0.9}
       onPress={onPress}
+      testID={testID}
       style={[
         styles.base,
         { backgroundColor: palette.bg },

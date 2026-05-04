@@ -59,7 +59,7 @@ export function ProjectListScreen({ navigation }: Props) {
   }, [navigation, loadProjects]);
 
   const handleCreate = async () => {
-    navigation.navigate('CreateProject');
+    navigation.navigate('Compose');
   };
 
   return (

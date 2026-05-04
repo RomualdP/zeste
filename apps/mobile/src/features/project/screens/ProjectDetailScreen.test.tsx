@@ -71,7 +71,7 @@ describe('ProjectDetailScreen', () => {
     });
 
     fireEvent.press(getByTestId('configure-button'));
-    expect(mockNavigation.navigate).toHaveBeenCalledWith('Configure', { projectId: 'p1' });
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('Compose', { projectId: 'p1' });
   });
 
   it('should show sources section', async () => {
@@ -166,7 +166,7 @@ describe('ProjectDetailScreen', () => {
     });
 
     fireEvent.press(getByTestId('add-source-button'));
-    expect(mockNavigation.navigate).toHaveBeenCalledWith('AddSource', { projectId: 'p1' });
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('Compose', { projectId: 'p1' });
   });
 
   it('should show delete project button', async () => {

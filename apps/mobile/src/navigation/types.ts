@@ -5,10 +5,9 @@ export type AuthStackParamList = {
 
 export type MainStackParamList = {
   ProjectList: undefined;
-  CreateProject: undefined;
   ProjectDetail: { projectId: string };
-  AddSource: { projectId: string };
-  Configure: { projectId: string };
+  Compose: { projectId?: string } | undefined;
+  Generating: { projectId: string };
   ChapterList: { projectId: string };
   Player: { projectId: string };
   Share: { projectId: string };

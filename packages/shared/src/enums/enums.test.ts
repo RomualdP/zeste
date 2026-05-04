@@ -6,6 +6,7 @@ import {
   Tone,
   TargetDuration,
   ChapterStatus,
+  GenerationPhase,
 } from './index';
 
 describe('ProjectStatus', () => {
@@ -60,5 +61,16 @@ describe('ChapterStatus', () => {
     expect(ChapterStatus.Generating).toBe('generating');
     expect(ChapterStatus.Ready).toBe('ready');
     expect(ChapterStatus.Error).toBe('error');
+  });
+});
+
+describe('GenerationPhase', () => {
+  it('should cover the unified pipeline phases', () => {
+    expect(GenerationPhase.Idle).toBe('idle');
+    expect(GenerationPhase.Plan).toBe('plan');
+    expect(GenerationPhase.Scenario).toBe('scenario');
+    expect(GenerationPhase.Audio).toBe('audio');
+    expect(GenerationPhase.Ready).toBe('ready');
+    expect(GenerationPhase.Error).toBe('error');
   });
 });

@@ -4,3 +4,4 @@ export { SourceStatus } from './source-status';
 export { Tone } from './tone';
 export { TargetDuration } from './target-duration';
 export { ChapterStatus } from './chapter-status';
+export { GenerationPhase } from './generation-phase';
